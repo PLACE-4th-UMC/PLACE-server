@@ -1,20 +1,11 @@
----
-name: Feature request
-about: Feature 작업 사항을 입력해주세요!
-title: "[FEAT]"
-labels: ''
-assignees: ''
+## 📌 구현 기능
+> 구현할 기능 설명
 
----
 
-## Is your feature request related to a problem? Please describe.
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## 🛠 작업 내용
+- [ ] TODO
+- [ ] TODO
+- [ ] TODO
 
-## Describe the solution you'd like
-A clear and concise description of what you want to happen.
-
-## Describe alternatives you've considered
-A clear and concise description of any alternative solutions or features you've considered.
-
-## Additional context
-Add any other context or screenshots about the feature request here.
+## 📢 의논 사항
+-
