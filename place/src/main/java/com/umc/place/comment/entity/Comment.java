@@ -1,4 +1,30 @@
 package com.umc.place.comment.entity;
 
-public class Comment {
+import com.umc.place.common.BaseEntity;
+import com.umc.place.story.entity.Story;
+import com.umc.place.user.entity.User;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@DynamicInsert
+public class Comment extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long commentIdx;
+
+    @ManyToOne
+    @JoinColumn(name = "userIdx")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "storyIdx")
+    private Story story;
+
+    @Column(nullable = false, length = 300)
+    private String content;
 }
