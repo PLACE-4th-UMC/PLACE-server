@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@DynamicInsert
+//@DynamicInsert
 public class Exhibition extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +41,7 @@ public class Exhibition extends BaseEntity {
     @Column(nullable = false)
     private String artist;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
 }

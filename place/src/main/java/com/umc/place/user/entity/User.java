@@ -25,8 +25,8 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String location;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
+    @Enumerated(EnumType.STRING)
     private Provider provider;
 
     @Column(nullable = false)
