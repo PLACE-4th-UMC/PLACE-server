@@ -12,7 +12,6 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @NoArgsConstructor
 @DynamicInsert
-@Table(name = "exhibitionLikes")
 public class ExhibitionLike extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
