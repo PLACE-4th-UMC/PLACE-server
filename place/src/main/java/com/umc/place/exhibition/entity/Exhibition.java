@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-//@DynamicInsert
+@DynamicInsert
 public class Exhibition extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class Exhibition extends BaseEntity {
     private String location;
 
     @Column
-    private Long fee;
+    private Integer fee;
 
     @Column(nullable = false)
     private String artist;

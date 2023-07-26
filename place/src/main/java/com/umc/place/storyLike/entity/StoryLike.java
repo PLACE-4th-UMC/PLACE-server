@@ -12,7 +12,6 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @NoArgsConstructor
 @DynamicInsert
-@Table(name = "storyLikes")
 public class StoryLike extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
