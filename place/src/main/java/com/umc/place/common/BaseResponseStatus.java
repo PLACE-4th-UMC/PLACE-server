@@ -12,6 +12,8 @@ public enum BaseResponseStatus {
     /**
      * 2000: Request 오류
      */
+    INVALID_STORY_IDX(false, 2100, "잘못된 스토리 Idx 입니다"),
+
     // user(2000~2099)
     INVALID_USER_IDX(false, 2000, "잘못된 user Idx 입니다."),
 
@@ -21,8 +23,6 @@ public enum BaseResponseStatus {
     INVALID_EXHIBITION_IDX(false, 2200, "잘못된 전시회 Idx 입니다."),
 
     // comment(2300~2399)
-
-
 
     /**
      * 3000: Response 오류
@@ -35,8 +35,7 @@ public enum BaseResponseStatus {
 
     // comment(3300~3399)
 
-
-
+  
     /**
      * 4000: DB, Server 오류
      */

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -17,11 +19,11 @@ public class ExhibitionLike extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long exhibitionLikeIdx;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "exhibitionIdx")
     private Exhibition exhibition;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "userIdx")
     private User user;
 }
