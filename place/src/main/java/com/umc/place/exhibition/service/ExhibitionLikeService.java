@@ -1,4 +1,4 @@
-package com.umc.place.exhibitionLike.service;
+package com.umc.place.exhibition.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

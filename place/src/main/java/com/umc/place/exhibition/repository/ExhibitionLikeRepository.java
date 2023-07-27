@@ -1,7 +1,7 @@
-package com.umc.place.exhibitionLike.repository;
+package com.umc.place.exhibition.repository;
 
 
-import com.umc.place.exhibitionLike.entity.ExhibitionLike;
+import com.umc.place.exhibition.entity.ExhibitionLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
