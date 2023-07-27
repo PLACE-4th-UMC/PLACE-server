@@ -14,7 +14,6 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor
 @DynamicInsert
-@Table(name = "exhibitionLikes")
 public class ExhibitionLike extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
