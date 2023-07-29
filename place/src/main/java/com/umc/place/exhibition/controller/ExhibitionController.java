@@ -7,6 +7,8 @@ import com.umc.place.exhibition.service.ExhibitionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import static com.umc.place.common.BaseResponseStatus.SUCCESS;
+
 @RestController
 @RequestMapping("/exhibitions")
 @RequiredArgsConstructor
@@ -18,9 +20,23 @@ public class ExhibitionController {
      */
     @ResponseBody
     @GetMapping("/{exhibitionIdx}/{userIdx}")
-    public BaseResponse<GetExhibitionDetailRes> getExhibitionDetail(@PathVariable("exhibitionIdx") Long exhibitionIdx, @PathVariable Long userIdx) { // TODO: authService 생성 후 userIdx 삭제
+    public BaseResponse<GetExhibitionDetailRes> getExhibitionDetail(@PathVariable("exhibitionIdx") Long exhibitionIdx, @PathVariable("userIdx") Long userIdx) { // TODO: authService 생성 후 userIdx 삭제
         try {
             return new BaseResponse<>(exhibitionService.getExhibitionDetail(exhibitionIdx, userIdx)); // TODO: userIdx -> authService.getUserIdx() 수정
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * [POST] 전시회 좋아요 누르기
+     */
+    @ResponseBody
+    @PostMapping("/{exhibitionIdx}/{userIdx}")
+    public BaseResponse<String> likeExhibition(@PathVariable("exhibitionIdx") Long exhibitionIdx, @PathVariable("userIdx") Long userIdx) { // TODO: authService 생성 후 userIdx 삭제
+        try {
+            exhibitionService.likeExhibition(exhibitionIdx, userIdx); // TODO: userIdx -> authService.getUserIdx() 수정
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }

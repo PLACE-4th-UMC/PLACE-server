@@ -1,9 +1,9 @@
-package com.umc.place.exhibitionLike.entity;
+package com.umc.place.exhibition.entity;
 
 import com.umc.place.common.BaseEntity;
-import com.umc.place.exhibition.entity.Exhibition;
 import com.umc.place.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
@@ -26,4 +26,10 @@ public class ExhibitionLike extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "userIdx")
     private User user;
+
+    @Builder
+    public ExhibitionLike(Exhibition exhibition, User user) {
+        this.exhibition = exhibition;
+        this.user = user;
+    }
 }
