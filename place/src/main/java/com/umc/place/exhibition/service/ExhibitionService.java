@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.ACTIVE;
+import static com.umc.place.common.Constant.INACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -90,11 +92,16 @@ public class ExhibitionService {
             Exhibition exhibition = exhibitionRepository.findById(exhibitionIdx).orElseThrow(() -> new BaseException(INVALID_EXHIBITION_IDX));
             // TODO: 비회원 예외 처리
             User user = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-
-            ExhibitionLike exhibitionLike = ExhibitionLike.builder()
-                    .exhibition(exhibition)
-                    .user(user)
-                    .build();
+            ExhibitionLike exhibitionLike = exhibitionLikeRepository.findByExhibitionAndUser(exhibition, user);
+            if (exhibitionLike == null) {
+                exhibitionLike = ExhibitionLike.builder()
+                        .exhibition(exhibition)
+                        .user(user)
+                        .build();
+            } else {
+                if(exhibitionLike.getStatus().equals(ACTIVE)) exhibitionLike.setStatus(INACTIVE);
+                else exhibitionLike.setStatus(ACTIVE);
+            }
             exhibitionLikeRepository.save(exhibitionLike);
         } catch (BaseException e) {
             throw e;
