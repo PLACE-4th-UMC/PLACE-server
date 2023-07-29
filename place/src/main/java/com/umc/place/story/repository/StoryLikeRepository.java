@@ -1,7 +1,7 @@
-package com.umc.place.storyLike.repository;
+package com.umc.place.story.repository;
 
 import com.umc.place.story.entity.Story;
-import com.umc.place.storyLike.entity.StoryLike;
+import com.umc.place.story.entity.StoryLike;
 import com.umc.place.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

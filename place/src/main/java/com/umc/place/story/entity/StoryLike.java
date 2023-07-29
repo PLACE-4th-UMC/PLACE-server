@@ -1,4 +1,4 @@
-package com.umc.place.storyLike.entity;
+package com.umc.place.story.entity;
 
 import com.umc.place.common.BaseEntity;
 import com.umc.place.story.entity.Story;
