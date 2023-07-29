@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -14,6 +15,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor
 @DynamicInsert
+@EntityListeners(AuditingEntityListener.class)
 public class ExhibitionLike extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
