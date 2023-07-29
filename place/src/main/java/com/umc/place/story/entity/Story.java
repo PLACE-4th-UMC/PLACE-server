@@ -3,7 +3,6 @@ package com.umc.place.story.entity;
 import com.umc.place.comment.entity.Comment;
 import com.umc.place.common.BaseEntity;
 import com.umc.place.exhibition.entity.Exhibition;
-import com.umc.place.storyLike.entity.StoryLike;
 import com.umc.place.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;

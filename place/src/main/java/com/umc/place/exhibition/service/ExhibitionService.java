@@ -8,7 +8,7 @@ import com.umc.place.exhibition.repository.ExhibitionRepository;
 import com.umc.place.exhibition.repository.ExhibitionLikeRepository;
 import com.umc.place.story.entity.Story;
 import com.umc.place.story.repository.StoryRepository;
-import com.umc.place.storyLike.repository.StoryLikeRepository;
+import com.umc.place.story.repository.StoryLikeRepository;
 import com.umc.place.user.entity.User;
 import com.umc.place.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
