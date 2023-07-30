@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,12 +42,20 @@ public class StoryService {
 
             User findUserById = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
 
-            StoryHistory history = StoryHistory.builder()
-                    .story(findStoryById)
-                    .user(findUserById)
-                    .build();
-
-            storyHistoryRepository.save(history);
+            // update history
+            Boolean existsByUserAndStory
+                    = storyHistoryRepository.existsByUserAndStory(findUserById, findStoryById);
+            if (existsByUserAndStory) {
+                StoryHistory history = storyHistoryRepository.findByUserAndStory(findUserById, findStoryById)
+                        .orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
+                history.setLastModifiedDate(LocalDateTime.now());
+            } else {
+                StoryHistory history = StoryHistory.builder()
+                        .story(findStoryById)
+                        .user(findUserById)
+                        .build();
+                storyHistoryRepository.save(history);
+            }
 
             List<CommentResDto> commentDtos = findStoryById.getComments().stream()
                     .map(comment -> new CommentResDto(comment))
@@ -82,7 +91,7 @@ public class StoryService {
 
             Story savedStory = storyRepository.save(newStory);
 
-            List<StoryHistory> dateDesc = storyHistoryRepository.findFirst4ByUserOrderByCreatedDateDesc(user);
+            List<StoryHistory> dateDesc = storyHistoryRepository.findFirst4ByUserOrderByLastModifiedDateDesc(user);
 
             return StoryUploadResponseDto.builder()
                     .latestStoryImg(savedStory.getStoryImg())
