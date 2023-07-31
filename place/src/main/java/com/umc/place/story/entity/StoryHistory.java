@@ -6,8 +6,12 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -16,10 +20,10 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @DynamicInsert
 @EntityListeners(AuditingEntityListener.class)
-public class StoryLike extends BaseEntity {
+public class StoryHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long storyLikeIdx;
+    private Long storyHistoryIdx;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "userIdx")
@@ -29,11 +33,13 @@ public class StoryLike extends BaseEntity {
     @JoinColumn(name = "storyIdx")
     private Story story;
 
+    @LastModifiedDate
+    @Setter // 재조회시 update date
+    private LocalDateTime lastModifiedDate;
+
     @Builder
-    public StoryLike(Long storyLikeIdx, User user, Story story) {
-        this.storyLikeIdx = storyLikeIdx;
+    public StoryHistory(User user, Story story) {
         this.user = user;
         this.story = story;
-        this.story.getLikes().add(this); // 양방향 연관관계 메서드
     }
 }
