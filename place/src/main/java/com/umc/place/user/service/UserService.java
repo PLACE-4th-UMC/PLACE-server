@@ -60,12 +60,12 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public PostUserRes signup_UserInfo(Long userIdx, PostNewUserReq postNewUserReq) throws BaseException {
         try{
-            User user = authService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX)); //값이 없을 경우
+            User user = authService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
             String accessToken = jwtTokenService.createAccessToken(userIdx);
             String refreshToken = jwtTokenService.createRefreshToken(userIdx);
 
             user.signup(postNewUserReq.getNickname(), postNewUserReq.getUserImg(), postNewUserReq.getBirthday(), postNewUserReq.getLocation());
-            authService.saveUser(user);
+            authService.saveUser(user); //repository에 저장
 
             return new PostUserRes(accessToken, refreshToken);
         } catch (BaseException e) {
