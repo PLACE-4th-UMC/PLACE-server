@@ -59,8 +59,8 @@ public class ExhibitionService {
      */
     public Page<GetExhibitionsRes> getExhibitionsByCategory(String categoryName, Pageable page) throws BaseException {
         try {
-            //Category category = Category.getCategoryByCategoryName(categoryName);
-            Category category = Category.valueOf(categoryName);
+            Category category = Category.getCategoryByCategoryName(categoryName);
+            //Category category = Category.valueOf(categoryName);
             if (category != null) {
                 boolean exhibitionExists = exhibitionRepository.existsByCategory(category);
                 System.out.println("categoryName = " + categoryName);

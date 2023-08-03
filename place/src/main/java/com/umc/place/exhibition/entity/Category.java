@@ -6,22 +6,23 @@ import java.util.Arrays;
 
 @Getter
 public enum Category {
-    DESIGN("디자인"),
-    INTERACTIVE("체험형"),
-    PHOTO("사진"),
-    INSTALLATION("설치미술"),
-    ETC("기타");
+    DESIGN("design", "디자인 전시"),
+    INTERACTIVE("interactive", "체험형 전시"),
+    PHOTO("photo", "사진 전시"),
+    INSTALLATION("installation", "설치형 전시"),
+    ETC("etc", "기타");
 
     private final String categoryName;
-
-    Category(String categoryName) {
+    private final String description;
+    Category(String categoryName, String description) {
         this.categoryName = categoryName;
+        this.description = description;
     }
 
-//    public static Category getCategoryByCategoryName(String categoryInput){
-//        return Arrays.stream(Category.values())
-//                .filter(category -> category.getCategoryName().equals(categoryInput))
-//                .findAny()
-//                .orElse(null);
-//    }
+    public static Category getCategoryByCategoryName(String categoryInput){
+        return Arrays.stream(Category.values())
+                .filter(category -> category.categoryName.equals(categoryInput))
+                .findAny()
+                .orElse(null);
+    }
 }
