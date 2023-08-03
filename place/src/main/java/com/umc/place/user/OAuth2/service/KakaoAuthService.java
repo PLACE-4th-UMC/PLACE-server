@@ -56,7 +56,7 @@ public class KakaoAuthService {
     }
 
     //카카오 토큰으로 사용자 정보(Long userIdx) 가져오기
-    public long getUserIdx(KakaoTokenResponse kakaoToken) throws JsonProcessingException {
+    public long getKakaoUserIdx (KakaoTokenResponse kakaoToken) throws JsonProcessingException {
 
         //header에 accessToken 담기
         HttpHeaders headers = new HttpHeaders();

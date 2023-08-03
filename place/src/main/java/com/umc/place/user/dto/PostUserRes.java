@@ -9,9 +9,8 @@ public class PostUserRes {
     private final String refreshToken;
 
     @Builder
-    public PostUserRes (String accessToken, String refreshToken){
+    public PostUserRes(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-
     }
 }

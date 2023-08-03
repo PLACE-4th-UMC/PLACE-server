@@ -15,12 +15,12 @@ import static com.umc.place.common.BaseResponseStatus.*;
 @RequiredArgsConstructor //생성자 자동 생성
 public class UserService {
 
+    private final RepositoryService repositoryService;
     private final AuthService authService;
-    private final JwtTokenService jwtTokenService;
 
     private PostUserRes signUpOrLogin(Long useridx, Provider provider) throws BaseException {
         //Provider provider = Provider.KAKAO;
-        User user = authService.findUserByIdAndProvider(useridx, provider);
+        User user = repositoryService.findUserByIdAndProvider(useridx, provider);
 
         //기존 회원이 아닐 경우 회원가입
         if (user == null)
@@ -30,8 +30,8 @@ public class UserService {
             throw new BaseException(ALREADY_WITHDRAW_USER);
         //기존 회원이면 로그인 처리
         user.login(); //user status active로 바꾸기
-        authService.saveUser(user); //userRepository에 user 저장
-        return jwtTokenService.createToken(user); //user의 access token, refresh token 반환
+        repositoryService.saveUser(user); //userRepository에 user 저장
+        return authService.createToken(user); //user의 access token, refresh token 반환
     }
 
     //로그인
@@ -39,7 +39,7 @@ public class UserService {
         try{
             if(Provider.getProviderByName(provider) == null)
                 throw new BaseException(INVALID_PROVIDER);
-            return signUpOrLogin(useridx, Provider.getProviderByName(provider));
+            return signUpOrLogin(useridx, Provider.getProviderByName(provider)); //access token, refresh token 반환
         } catch (BaseException e){
             throw e;
         } catch (Exception e){
@@ -53,19 +53,20 @@ public class UserService {
                 .userIdx(userIdx)
                 .provider(provider)
                 .build();
-        return authService.saveUser(newuser);
+        return repositoryService.saveUser(newuser);
     }
 
     //회원 가입 후 사용자 정보 입력
     @Transactional(rollbackFor = Exception.class)
     public PostUserRes signup_UserInfo(Long userIdx, PostNewUserReq postNewUserReq) throws BaseException {
         try{
-            User user = authService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
-            String accessToken = jwtTokenService.createAccessToken(userIdx);
-            String refreshToken = jwtTokenService.createRefreshToken(userIdx);
+            //userIdx로 해당 user 찾기
+            User user = repositoryService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
+            String accessToken = authService.createAccessToken(userIdx);
+            String refreshToken = authService.createRefreshToken(userIdx);
 
-            user.signup(postNewUserReq.getNickname(), postNewUserReq.getUserImg(), postNewUserReq.getBirthday(), postNewUserReq.getLocation());
-            authService.saveUser(user); //repository에 저장
+            user.signup(postNewUserReq.getNickname(), postNewUserReq.getUserImg(), postNewUserReq.getBirthday(), postNewUserReq.getLocation(), postNewUserReq.getEmail());
+            repositoryService.saveUser(user); //repository에 저장
 
             return new PostUserRes(accessToken, refreshToken);
         } catch (BaseException e) {
@@ -77,7 +78,7 @@ public class UserService {
 
     //닉네임 중복 확인하기
     public void checkNickname(PostNicknameReq postNicknameReq) throws BaseException {
-        boolean existence = authService.existsByNickname(postNicknameReq.getNickname());
+        boolean existence = repositoryService.existsByNickname(postNicknameReq.getNickname());
         if(existence) throw new BaseException(EXIST_NICKNAME);
     }
 
