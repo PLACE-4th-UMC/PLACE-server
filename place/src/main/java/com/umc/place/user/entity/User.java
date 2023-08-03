@@ -40,6 +40,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Date birthday;
 
+    //삭제하기
     @Column(nullable = false)
     private String accessToken;
 
@@ -52,11 +53,12 @@ public class User extends BaseEntity {
         this.provider = provider;
     }
 
-    public void signup(String nickname, String userImg, Date birthday, String location){
+    public void signup(String nickname, String userImg, Date birthday, String location, String email){
         this.nickname = nickname;
         this.userImg = userImg;
         this.birthday = birthday;
         this.location = location;
+        this.email = email;
     }
 
     public void storeSignUp(String nickname, String userImg, Provider provider) {
