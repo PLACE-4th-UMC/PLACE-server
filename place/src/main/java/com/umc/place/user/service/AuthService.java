@@ -4,6 +4,7 @@ import com.umc.place.common.BaseException;
 import com.umc.place.common.Constant;
 import com.umc.place.user.dto.PostUserRes;
 import com.umc.place.user.entity.User;
+import com.umc.place.user.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,25 +30,11 @@ public class AuthService {
     @Value("${auth.key}")
     private String key;
     String CLAIM_NAME = "userIdx";
-    Long ADMIN_USERIDX = 0L;
     String REQUEST_HEADER_NAME = "Authorization";
     public static final String TOKEN_REGEX = "^Bearer( )*";
     public static final String TOKEN_REPLACEMENT = "";
 
-    private final RepositoryService repositoryService;
-
-
-    /**
-     * userIdx 선택
-     * @return 있으면 id, 없으면 ADMIN_USERIDX
-     */
-    public Long getUserIdxOptional() throws BaseException{
-        String token = getToken();
-        Long userIdx;
-        if(token!=null) userIdx = getClaims(token).getBody().get(CLAIM_NAME, Long.class);
-        else userIdx = ADMIN_USERIDX;
-        return userIdx;
-    }
+    private final UserRepository userRepository;
 
     /**
      * userIdx 필수
@@ -124,7 +111,7 @@ public class AuthService {
     // 회원 로그아웃
     public void logout(Long userIdx) throws BaseException {
         deleteToken(userIdx);
-        User user = repositoryService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
+        User user = userRepository.findByUserIdxAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
         String token = user.getAccessToken();
         registerBlackList(token, Constant.LOGOUT);
     }
@@ -132,7 +119,7 @@ public class AuthService {
     // 회원 탈퇴
     public void signout(Long userIdx) throws BaseException {
         deleteToken(userIdx);
-        User user = repositoryService.findUserByIdAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
+        User user = userRepository.findByUserIdxAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
         String token = user.getAccessToken();
         registerBlackList(token, Constant.INACTIVE);
     }
@@ -152,4 +139,5 @@ public class AuthService {
         Long expiration = AccessTokenExpiration.getTime() - now;
         redisTemplate.opsForValue().set(token, status, Duration.ofMillis(expiration));
     }
+
 }
