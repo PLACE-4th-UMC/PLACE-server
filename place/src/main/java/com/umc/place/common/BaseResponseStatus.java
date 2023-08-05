@@ -22,6 +22,7 @@ public enum BaseResponseStatus {
     // exhibition(2200~2299)
     INVALID_EXHIBITION_IDX(false, 2200, "잘못된 전시회 Idx 입니다."),
     INVALID_CATEGORY(false, 2201, "잘못된 카테고리입니다."),
+    NULL_EXHIBITION_LIKE(false, 2202, "전시회 좋아요 수가 이미 0입니다."),
 
     // comment(2300~2399)
 

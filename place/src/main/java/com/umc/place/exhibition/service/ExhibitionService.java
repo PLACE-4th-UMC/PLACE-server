@@ -79,7 +79,6 @@ public class ExhibitionService {
         }
     }
 
-
     /**
      * 전시회 상세 조회
      * @param exhibitionIdx
@@ -93,12 +92,8 @@ public class ExhibitionService {
             List<GetExhibitionDetailRes.Story> storyList;
             if (userRepository.existsById(userIdx)) {
                 User user = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
-                //List<GetExhibitionDetailRes.Story> storyList = getStoryList(exhibition, user);
                 storyList = getStoryList(exhibition, user);
-            } else {
-                storyList = getStoryListAnonymous(exhibition);
-            }
-
+            } else storyList = getStoryListAnonymous(exhibition);
             // TODO: S3 설정 완료 후 이미지 가져오는 부분 수정 필요
             return new GetExhibitionDetailRes(exhibition.getExhibitionName(), exhibition.getStartDate(), exhibition.getEndDate(),
                     exhibition.getExhibitionImg(), exhibition.getOperatingTime(), exhibition.getLocation(), exhibition.getFee(), exhibition.getArtist(), storyList);
@@ -107,7 +102,6 @@ public class ExhibitionService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
-
     }
 
     // 회원) 스토리 조회
@@ -127,6 +121,10 @@ public class ExhibitionService {
         return storyRepository.findFirst2ByExhibition(exhibition).stream()
                 .map(story -> new GetExhibitionDetailRes.Story(story.getStoryIdx(), story.getStoryImg(), story.getUser().getNickname(),
                         story.getUser().getUserImg(), Boolean.FALSE)).collect(Collectors.toList());
+    }
+
+    public int updateViewCount(Long exhibitionIdx) {
+        return exhibitionRepository.updateView(exhibitionIdx);
     }
 
     /**
@@ -149,9 +147,10 @@ public class ExhibitionService {
                         .build(); // status = active(default)
                 exhibition.setLikeCount(exhibition.getLikeCount()+1);
             } else { // 이미 존재
-                if(exhibitionLike.getStatus().equals(ACTIVE)) { // 눌린 상태면 취소
+                if (exhibitionLike.getStatus().equals(ACTIVE)) { // 눌린 상태면 취소
                     exhibitionLike.setStatus(INACTIVE);
-                    exhibition.setLikeCount(exhibition.getLikeCount()-1);
+                    if (exhibition.getLikeCount() > 0) exhibition.setLikeCount(exhibition.getLikeCount()-1);
+                    else throw new BaseException(NULL_EXHIBITION_LIKE);
                 } else { // 안눌린 상태면 좋아요
                     exhibitionLike.setStatus(ACTIVE);
                     exhibition.setLikeCount(exhibition.getLikeCount()+1);
