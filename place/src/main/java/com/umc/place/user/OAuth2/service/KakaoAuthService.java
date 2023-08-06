@@ -23,19 +23,19 @@ import java.util.Map;
 @Slf4j
 public class KakaoAuthService {
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId;
 
-    //@Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    //@Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
     //private String kakaoClientSecret;
 
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    @Value("${spring.OAuth2.google.url.token}")
+    @Value("${spring.OAuth2.kakao.url.token}")
     private String KAKAO_TOKEN_REQUEST_URL;
 
-    @Value("${spring.OAuth2.google.url.profile}")
+    @Value("${spring.OAuth2.kakao.url.profile}")
     private String KAKAO_USERINFO_REQUEST_URL;
 
     //인가코드로 카카오 토큰 발급받기
@@ -55,8 +55,8 @@ public class KakaoAuthService {
         return kakaoOAuthToken;
     }
 
-    //카카오 토큰으로 사용자 정보(Long userIdx) 가져오기
-    public long getKakaoUserIdx (KakaoTokenResponse kakaoToken) throws JsonProcessingException {
+    //카카오 토큰으로 사용자 정보(식별자) 가져오기
+    public String getKakaoUserIdx (KakaoTokenResponse kakaoToken) throws JsonProcessingException {
 
         //header에 accessToken 담기
         HttpHeaders headers = new HttpHeaders();
@@ -71,10 +71,9 @@ public class KakaoAuthService {
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
 
         //user id 가져오기
-        String id = jsonNode.get("id").asText();
-        long userIdx = Long.parseLong(id);
+        String identifier = jsonNode.get("id").asText();
 
-        return userIdx;
+        return identifier;
     }
 
 }

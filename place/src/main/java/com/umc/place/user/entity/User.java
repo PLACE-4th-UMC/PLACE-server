@@ -21,6 +21,9 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userIdx;
 
+    @Column(nullable = false)
+    private String identifier;
+
     @Column(nullable = false, length = 10)
     private String nickname;
 
@@ -48,8 +51,8 @@ public class User extends BaseEntity {
     private String refreshToken;
 
     @Builder
-    public User(Long userIdx, Provider provider) {
-        this.userIdx = userIdx;
+    public User(String identifier, Provider provider) {
+        this.identifier = identifier;
         this.provider = provider;
     }
 
@@ -83,6 +86,14 @@ public class User extends BaseEntity {
     }
     public void setProvider(Provider provider){
         this.provider = provider;
+    }
+
+    public void modifyNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void modifyUserImg(String userImg) {
+        this.userImg = userImg;
     }
 
     public void logout() {
