@@ -91,6 +91,7 @@ public class ExhibitionService {
      */
     public Page<GetExhibitionsRes> searchExhibitions(String searchWord, Pageable page) throws BaseException {
         try {
+            searchWord = searchWord.replace(" ", ""); // 검색어에서 공백 제거
             boolean searchResultExists = exhibitionRepository.existsByLocationLike(searchWord);
             if (searchResultExists) {
                 return exhibitionRepository.findByLocationLike(searchWord, page)
