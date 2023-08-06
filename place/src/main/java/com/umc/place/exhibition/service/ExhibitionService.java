@@ -43,8 +43,11 @@ public class ExhibitionService {
      */
     public Page<GetExhibitionsRes> getExhibitions(Pageable page) throws BaseException {
         try {
-            return exhibitionRepository.findAll(page).map(exhibition -> new GetExhibitionsRes(exhibition.getExhibitionIdx(),
-                    exhibition.getExhibitionName(), exhibition.getExhibitionImg(), exhibition.getLocation()));
+            return exhibitionRepository.findAll(page).map(exhibition -> new GetExhibitionsRes(
+                    exhibition.getExhibitionIdx(),
+                    exhibition.getExhibitionName(),
+                    exhibition.getExhibitionImg(),
+                    exhibition.getLocation()));
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -62,7 +65,7 @@ public class ExhibitionService {
             //Category category = Category.valueOf(categoryName);
             if (category != null) {
                 boolean exhibitionExists = exhibitionRepository.existsByCategory(category);
-                System.out.println("categoryName = " + categoryName);
+//                System.out.println("categoryName = " + categoryName);
                 if (exhibitionExists) {
                     Page<Exhibition> exhibitionPage = exhibitionRepository.findByCategory(category, page);
                     return exhibitionPage.map(exhibition -> new GetExhibitionsRes(
@@ -72,6 +75,31 @@ public class ExhibitionService {
                             exhibition.getLocation()));
                 } else throw new BaseException(NULL_EXHIBITION);
             } else throw new BaseException(INVALID_CATEGORY);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 지역 기반 전시회 목록 검색(최신순, 조회수순, 좋아요수순 정렬)
+     * @param searchWord
+     * @param page
+     * @return page
+     * @throws BaseException
+     */
+    public Page<GetExhibitionsRes> searchExhibitions(String searchWord, Pageable page) throws BaseException {
+        try {
+            boolean searchResultExists = exhibitionRepository.existsByLocationLike(searchWord);
+            if (searchResultExists) {
+                return exhibitionRepository.findByLocationLike(searchWord, page)
+                        .map(exhibition -> new GetExhibitionsRes(
+                                exhibition.getExhibitionIdx(),
+                                exhibition.getExhibitionName(),
+                                exhibition.getExhibitionImg(),
+                                exhibition.getLocation()));
+            } else throw new BaseException(NULL_EXHIBITION);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -95,8 +123,16 @@ public class ExhibitionService {
                 storyList = getStoryList(exhibition, user);
             } else storyList = getStoryListAnonymous(exhibition);
             // TODO: S3 설정 완료 후 이미지 가져오는 부분 수정 필요
-            return new GetExhibitionDetailRes(exhibition.getExhibitionName(), exhibition.getStartDate(), exhibition.getEndDate(),
-                    exhibition.getExhibitionImg(), exhibition.getOperatingTime(), exhibition.getLocation(), exhibition.getFee(), exhibition.getArtist(), storyList);
+            return new GetExhibitionDetailRes(
+                    exhibition.getExhibitionName(),
+                    exhibition.getStartDate(),
+                    exhibition.getEndDate(),
+                    exhibition.getExhibitionImg(),
+                    exhibition.getOperatingTime(),
+                    exhibition.getLocation(),
+                    exhibition.getFee(),
+                    exhibition.getArtist(),
+                    storyList);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -107,8 +143,13 @@ public class ExhibitionService {
     // 회원) 스토리 조회
     private List<GetExhibitionDetailRes.Story> getStoryList(Exhibition exhibition, User user) {
         return storyRepository.findFirst2ByExhibition(exhibition).stream()
-                .map(story -> new GetExhibitionDetailRes.Story(story.getStoryIdx(), story.getStoryImg(), story.getUser().getNickname(),
-                        story.getUser().getUserImg(), getLike(user, story))).collect(Collectors.toList());
+                .map(story -> new GetExhibitionDetailRes.Story(
+                        story.getStoryIdx(),
+                        story.getStoryImg(),
+                        story.getUser().getNickname(),
+                        story.getUser().getUserImg(),
+                        getLike(user, story)))
+                .collect(Collectors.toList());
     }
 
     private Boolean getLike(User user, Story story) {
@@ -119,8 +160,13 @@ public class ExhibitionService {
     // 비회원) 스토리 조회
     private List<GetExhibitionDetailRes.Story> getStoryListAnonymous(Exhibition exhibition) {
         return storyRepository.findFirst2ByExhibition(exhibition).stream()
-                .map(story -> new GetExhibitionDetailRes.Story(story.getStoryIdx(), story.getStoryImg(), story.getUser().getNickname(),
-                        story.getUser().getUserImg(), Boolean.FALSE)).collect(Collectors.toList());
+                .map(story -> new GetExhibitionDetailRes.Story(
+                        story.getStoryIdx(),
+                        story.getStoryImg(),
+                        story.getUser().getNickname(),
+                        story.getUser().getUserImg(),
+                        Boolean.FALSE))
+                .collect(Collectors.toList());
     }
 
     public int updateViewCount(Long exhibitionIdx) {
