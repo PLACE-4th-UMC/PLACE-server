@@ -27,11 +27,16 @@ public class ExhibitionController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<Page<GetExhibitionsRes>> getExhibitions(@RequestParam(required = false) String categoryName, @PageableDefault(size = 20) Pageable page) {
+    public BaseResponse<Page<GetExhibitionsRes>> getExhibitions(@PageableDefault(size = 20) Pageable page,
+                                                                @RequestParam(required = false) String categoryName,
+                                                                @RequestParam(required = false) String searchWord) {
         try {
-            if (categoryName.isBlank()) {
-                return new BaseResponse<>(exhibitionService.getExhibitions(page)); // 전체 목록 조회 .getContent() 추가 시 content만 가져오기 가능
-            } else return new BaseResponse<>(exhibitionService.getExhibitionsByCategory(categoryName, page)); // 카테고리 기반 조회
+            // categoryName, searchWord 동시 입력 예외처리
+            if (searchWord.isBlank()) {
+                if (categoryName.isBlank()) {
+                    return new BaseResponse<>(exhibitionService.getExhibitions(page)); // 전체 목록 조회 getContent() 추가 시 content만 가져오기 가능
+                } else return new BaseResponse<>(exhibitionService.getExhibitionsByCategory(categoryName, page)); // 카테고리 기반 조회
+            } else return new BaseResponse<>(exhibitionService.searchExhibitions(searchWord, page)); // 지역 기반 검색
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
