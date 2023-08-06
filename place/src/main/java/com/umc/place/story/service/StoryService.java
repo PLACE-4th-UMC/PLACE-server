@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
@@ -105,6 +106,33 @@ public class StoryService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
 
+        }
+    }
+
+    public StoryUploadResponseDto getStoryView(Long userId) throws BaseException {
+        try {
+            User findUser = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            List<StoryHistory> storyHistoryList
+                    = storyHistoryRepository.findFirst4ByUserOrderByLastModifiedDateDesc(findUser);
+            Optional<Story> latestStory = storyRepository
+                    .findFirstByUserOrderByCreatedDateDesc(findUser);
+
+            if (latestStory.isPresent()) {
+                return StoryUploadResponseDto.builder()
+                        .recentStories(storyHistoryList)
+                        .latestStoryImg(latestStory.get().getStoryImg())
+                        .latestStoryName(latestStory.get().getExhibition().getExhibitionName())
+                        .latestStoryLocation(latestStory.get().getExhibition().getLocation())
+                        .build();
+            } else {
+                return StoryUploadResponseDto.builder()
+                        .recentStories(storyHistoryList)
+                        .build();
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 }

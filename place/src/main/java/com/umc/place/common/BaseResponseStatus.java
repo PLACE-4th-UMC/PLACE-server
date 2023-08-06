@@ -8,6 +8,7 @@ public enum BaseResponseStatus {
      * 1000: 요청 성공
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
+    NULL_STORY(true, 1001, "해당 유저가 생성한 스토리가 아직 없습니다."),
 
     /**
      * 2000: Request 오류
@@ -38,7 +39,7 @@ public enum BaseResponseStatus {
 
     // comment(3300~3399)
 
-  
+
     /**
      * 4000: DB, Server 오류
      */
