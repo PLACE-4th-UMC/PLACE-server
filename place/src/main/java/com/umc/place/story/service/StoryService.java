@@ -2,6 +2,7 @@ package com.umc.place.story.service;
 
 import com.umc.place.comment.dto.CommentResDto;
 import com.umc.place.common.BaseException;
+import com.umc.place.exhibition.dto.SearchExhibitionsByNameResDto;
 import com.umc.place.exhibition.entity.Exhibition;
 import com.umc.place.exhibition.repository.ExhibitionRepository;
 import com.umc.place.story.dto.StoryDetailResponseDto;
@@ -15,6 +16,8 @@ import com.umc.place.story.repository.StoryRepository;
 import com.umc.place.user.entity.User;
 import com.umc.place.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +74,19 @@ public class StoryService {
                     .build();
         } catch (BaseException e) {
             throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public SearchExhibitionsByNameResDto searchExhibitionByName(String searchWord, Pageable page) throws BaseException {
+        try {
+            searchWord = searchWord.trim();
+            Page<Exhibition> searchedExhibitions
+                    = exhibitionRepository.findByExhibitionNameContainingOrderByExhibitionName(searchWord, page);
+            return SearchExhibitionsByNameResDto.builder()
+                    .exhibitions(searchedExhibitions)
+                    .build();
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
