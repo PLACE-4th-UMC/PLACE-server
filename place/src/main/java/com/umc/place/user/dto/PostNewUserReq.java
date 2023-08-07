@@ -8,9 +8,9 @@ import java.util.Date;
 @Data
 @RequiredArgsConstructor
 public class PostNewUserReq {
+    private String userImg;
     private String nickname;
-    private String UserImg;
     private String email;
-    private String location;
     private Date birthday;
+    private String location;
 }
