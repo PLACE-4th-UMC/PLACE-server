@@ -1,11 +1,13 @@
 package com.umc.place.user.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import org.antlr.v4.runtime.misc.NotNull;
 
 @Getter
 public class LoginRequest {
-    @NotNull
+    @NotBlank
     private String code;
+
+    private String state;
     private String provider;
 }

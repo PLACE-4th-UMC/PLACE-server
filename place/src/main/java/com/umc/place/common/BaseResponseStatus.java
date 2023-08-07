@@ -22,6 +22,7 @@ public enum BaseResponseStatus {
     INVALID_TOKEN(false, 2006, "유효하지 않은 토큰 값입니다."),
     UNSUPPORTED_TOKEN(false, 2007, "잘못된 형식의 토큰 값입니다."),
     MALFORMED_TOKEN(false, 2008, "잘못된 구조의 토큰 값입니다."),
+    INVALID_IDENTIFIER(false, 2009, "잘못된 식별자 입니다."),
 
     // story(2100~2199)
     INVALID_STORY_IDX(false, 2100, "잘못된 스토리 Idx 입니다"),
