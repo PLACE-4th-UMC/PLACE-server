@@ -112,6 +112,46 @@ public class UserService {
         }
     }
 
+    //회원 탈퇴
+    @Transactional(rollbackFor = Exception.class)
+    public void signout(String identifier) throws BaseException {
+        try{
+            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+            userRepository.delete(user);
+            authService.deleteToken(identifier);
+            String token = user.getAccessToken();
+            authService.registerBlackList(token, Constant.INACTIVE);
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //로그아웃
+    @Transactional
+    public void logout (String identifier) throws BaseException {
+        try{
+            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+            authService.deleteToken(identifier);
+            String token = user.getAccessToken();
+            authService.registerBlackList(token, Constant.LOGOUT);
+            user.logout();
+        } catch (BaseException e){
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // AccessToken 재발급
+    @Transactional
+    public PostUserRes reissueToken (PostTokenReq postTokenReq) throws BaseException {
+        User user = userRepository.findByIdentifierAndStatus(postTokenReq.getIdentifier(),"active")
+                .orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+        authService.validateRefreshToken(user.getIdentifier(), postTokenReq.getRefreshToken());
+        return authService.createToken(user);
+    }
 
 
 }
