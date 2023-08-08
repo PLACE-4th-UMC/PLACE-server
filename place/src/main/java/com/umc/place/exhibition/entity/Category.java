@@ -2,19 +2,27 @@ package com.umc.place.exhibition.entity;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 public enum Category {
-    DESIGN(1, "디자인"),
-    INTERACTIVE(2, "체험형"), 
-    PHOTO(3, "사진"),
-    INSTALLATION(4, "설치미술"),
-    ETC(5, "기타");
+    DESIGN("design", "디자인 전시"),
+    INTERACTIVE("interactive", "체험형 전시"),
+    PHOTO("photo", "사진 전시"),
+    INSTALLATION("installation", "설치형 전시"),
+    ETC("etc", "기타");
 
-    private final int num;
-    private final String category;
+    private final String categoryName;
+    private final String description;
+    Category(String categoryName, String description) {
+        this.categoryName = categoryName;
+        this.description = description;
+    }
 
-    Category(int num, String category) {
-        this.num = num;
-        this.category = category;
+    public static Category getCategoryByCategoryName(String categoryInput){
+        return Arrays.stream(Category.values())
+                .filter(category -> category.categoryName.equals(categoryInput))
+                .findAny()
+                .orElse(null);
     }
 }

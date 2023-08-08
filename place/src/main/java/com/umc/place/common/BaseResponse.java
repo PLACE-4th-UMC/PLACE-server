@@ -33,4 +33,12 @@ public class BaseResponse<T> {
         this.message = status.getMessage();
         this.code = status.getCode();
     }
+
+    // 요청은 성공했지만 데이터에 이상이 있는 경우
+    public BaseResponse(T result, BaseResponseStatus status) {
+        this.isSuccess = status.isSuccess();
+        this.message = status.getMessage();
+        this.code = status.getCode();
+        this.result = result;
+    }
 }
