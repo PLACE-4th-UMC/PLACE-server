@@ -2,6 +2,10 @@ package com.umc.place.user.service;
 
 import com.umc.place.common.BaseException;
 import com.umc.place.common.Constant;
+import com.umc.place.story.entity.Story;
+import com.umc.place.story.entity.StoryLike;
+import com.umc.place.story.repository.StoryLikeRepository;
+import com.umc.place.story.repository.StoryRepository;
 import com.umc.place.user.dto.*;
 import com.umc.place.user.entity.Provider;
 import com.umc.place.user.entity.User;
@@ -10,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 import static com.umc.place.common.BaseResponseStatus.*;
 
 @Service
@@ -17,6 +24,7 @@ import static com.umc.place.common.BaseResponseStatus.*;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StoryRepository storyRepository;
     private final AuthService authService;
 
     //로그인
@@ -87,7 +95,11 @@ public class UserService {
         String identifier = authService.getIdentifier();
         User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
         int year = user.getCreatedDate().getYear();
-        return new GetProfileRes(user.getUserImg(), user.getNickname(), "Hello, " + user.getNickname(), year);
+
+        //내가 작성한 스토리 가져오기
+        Optional <Story> storyList = storyRepository.findFirstByUserOrderByCreatedDateDesc(user);
+
+        return new GetProfileRes(user.getUserImg(), user.getNickname(), "Hello, " + user.getNickname(), year, storyList);
     }
 
     //사용자 프로필 수정
