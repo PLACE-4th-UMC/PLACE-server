@@ -1,10 +1,10 @@
 package com.umc.place.user.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import com.umc.place.common.BaseException;
 import com.umc.place.common.BaseResponse;
 import com.umc.place.user.OAuth2.dto.GoogleTokenResponse;
 import com.umc.place.user.OAuth2.dto.KakaoTokenResponse;
+import com.umc.place.user.OAuth2.dto.NaverTokenResponse;
 import com.umc.place.user.OAuth2.service.GoogleAuthService;
 import com.umc.place.user.OAuth2.service.KakaoAuthService;
 import com.umc.place.user.OAuth2.service.NaverAuthService;
@@ -30,8 +30,8 @@ public class UserController {
 
     //카카오 소셜 로그인
     @ResponseBody
-    @PostMapping("/login/kakao")
-    public BaseResponse<?> login_kakao(@RequestBody LoginRequest loginRequest) throws IOException {
+    @PostMapping("/login")
+    public BaseResponse<?> login (@RequestBody LoginRequest loginRequest) throws IOException {
         try{
             //인가코드 가져와서 카카오에서 access 토큰 받아오기
             KakaoTokenResponse kakaoTokenResponse = kakaoAuthService.getKakaoToken(loginRequest.getCode());
@@ -43,6 +43,7 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
     //구글 소셜 로그인
     @ResponseBody
     @PostMapping("/login/google")
@@ -51,6 +52,20 @@ public class UserController {
             GoogleTokenResponse googleTokenResponse = googleAuthService.getGoogleToken(loginRequest.getCode());
             String identifier = googleAuthService.getGoogleIdentifier(googleTokenResponse);
             PostUserRes postUserRes = userService.login(identifier, "구글");
+            return new BaseResponse<>(postUserRes);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @ResponseBody
+    @PostMapping("/login/naver")
+    public BaseResponse<?> login_naver(@RequestBody LoginRequest loginRequest) throws IOException {
+        try{
+            //인가 코드, state로 access 토큰 가져오기
+            NaverTokenResponse naverTokenResponse = naverAuthService.getNaverToken(loginRequest.getCode(), loginRequest.getState());
+            String identifier = naverAuthService.getNaverIdentifier(naverTokenResponse);
+            PostUserRes postUserRes = userService.login(identifier, "네이버");
             return new BaseResponse<>(postUserRes);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -105,6 +120,41 @@ public class UserController {
         }
     }
 
+    //회원 탈퇴
+    @DeleteMapping("/signout")
+    public BaseResponse<?> signout() {
+        try{
+            String identifier = authService.getIdentifier();
+            userService.signout(identifier);
+            return new BaseResponse<>(SUCCESS);
+        }
+        catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    //회원 로그아웃
+    @PatchMapping("/logout")
+    public BaseResponse<?> logout() {
+        try{
+            String identifier = authService.getIdentifier();
+            userService.logout(identifier);
+            return new BaseResponse<>(SUCCESS);
+        } catch(BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    //AccessToken 재발급
+    @ResponseBody
+    @PostMapping("/reissue")
+    public BaseResponse<?> reissueToken(@RequestBody PostTokenReq postTokenReq) {
+        try {
+            return new BaseResponse<>(userService.reissueToken(postTokenReq));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 
 
 }
