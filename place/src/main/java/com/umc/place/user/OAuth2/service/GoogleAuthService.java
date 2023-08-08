@@ -37,10 +37,10 @@ public class GoogleAuthService {
     @Value("${spring.OAuth2.google.url.profile}")
     private String GOOGLE_USERINFO_REQUEST_URL;
 
-    //인가코드로 카카오 토큰 발급받기
-    public GoogleTokenResponse getGoogleToken (String authorizationCode) throws JsonProcessingException {
+    //인가코드로 구글 토큰 발급받기
+    public GoogleTokenResponse getGoogleToken (String code) throws JsonProcessingException {
         Map<String, Object> params = new HashMap<>();
-        params.put("code", authorizationCode);
+        params.put("code", code);
         params.put("client_id", googleClientId);
         params.put("client_secret", googleClientSecret);
         params.put("redirect_uri", googleRedirectUri);
