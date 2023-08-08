@@ -1,5 +1,8 @@
 package com.umc.place.story.controller;
 
+import com.umc.place.comment.dto.CommentUploadReqDto;
+import com.umc.place.comment.dto.CommentUploadResDto;
+import com.umc.place.comment.service.CommentService;
 import com.umc.place.common.BaseException;
 import com.umc.place.common.BaseResponse;
 import com.umc.place.story.dto.StoryDetailResponseDto;
@@ -17,6 +20,7 @@ import static com.umc.place.common.BaseResponseStatus.NULL_STORY;
 public class StoryController {
 
     private final StoryService storyService;
+    private final CommentService commentService;
 
     @PostMapping("")
     public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto,
@@ -32,6 +36,17 @@ public class StoryController {
     public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx, @RequestParam Long userId) {
         try {
             return new BaseResponse<>(storyService.getStoryDetail(storyIdx, userId));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PostMapping("/{storyIdx}/comment")
+    public BaseResponse<CommentUploadResDto> uploadStoryComment(@PathVariable Long storyIdx,
+                                                                @RequestBody CommentUploadReqDto reqDto,
+                                                                @RequestParam Long userId) {
+        try {
+            return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, userId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
