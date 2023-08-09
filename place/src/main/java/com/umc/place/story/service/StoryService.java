@@ -10,6 +10,7 @@ import com.umc.place.story.dto.StoryUploadRequestDto;
 import com.umc.place.story.dto.StoryUploadResponseDto;
 import com.umc.place.story.entity.Story;
 import com.umc.place.story.entity.StoryHistory;
+import com.umc.place.story.entity.StoryLike;
 import com.umc.place.story.repository.StoryHistoryRepository;
 import com.umc.place.story.repository.StoryLikeRepository;
 import com.umc.place.story.repository.StoryRepository;
@@ -25,6 +26,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.ACTIVE;
+import static com.umc.place.common.Constant.INACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -130,6 +133,33 @@ public class StoryService {
                 return StoryUploadResponseDto.builder()
                         .recentStories(storyHistoryList)
                         .build();
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public void likeStory(Long storyIdx, Long userIdx) throws BaseException {
+        try {
+            User user = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Story story = storyRepository.findById(storyIdx).orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
+
+            StoryLike storyLike = storyLikeRepository.findByUserAndStory(user, story);
+            if (storyLike == null) {
+                StoryLike newLike = StoryLike.builder()
+                        .user(user)
+                        .story(story)
+                        .build();
+                storyLikeRepository.save(newLike);
+            } else {
+                if (storyLike.getStatus().equals(ACTIVE)) {
+                    storyLike.setStatus(INACTIVE);
+                } else {
+                    storyLike.getStatus().equals(ACTIVE);
+                }
             }
         } catch (BaseException e) {
             throw e;

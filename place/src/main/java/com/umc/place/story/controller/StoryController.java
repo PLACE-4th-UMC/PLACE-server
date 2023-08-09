@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import static com.umc.place.common.BaseResponseStatus.NULL_STORY;
+import static com.umc.place.common.BaseResponseStatus.SUCCESS;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,6 +48,17 @@ public class StoryController {
                                                                 @RequestParam Long userId) {
         try {
             return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, userId));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @PostMapping("/{storyIdx}/like")
+    public BaseResponse<Void> likeStory(@PathVariable Long storyIdx,
+                                        @RequestParam Long userIdx) {
+        try {
+            storyService.likeStory(storyIdx, userIdx);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
