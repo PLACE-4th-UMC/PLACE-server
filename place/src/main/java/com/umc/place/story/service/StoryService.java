@@ -1,6 +1,7 @@
 package com.umc.place.story.service;
 
 import com.umc.place.comment.dto.CommentResDto;
+import com.umc.place.comment.repository.CommentRepository;
 import com.umc.place.common.BaseException;
 import com.umc.place.exhibition.entity.Exhibition;
 import com.umc.place.exhibition.repository.ExhibitionRepository;
@@ -34,6 +35,7 @@ public class StoryService {
     private final StoryHistoryRepository storyHistoryRepository;
     private final ExhibitionRepository exhibitionRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public StoryDetailResponseDto getStoryDetail(Long storyIdx, Long userId) throws BaseException {
@@ -63,7 +65,7 @@ public class StoryService {
                     .collect(Collectors.toList());
 
             return StoryDetailResponseDto.builder()
-                    .exhibitionImg(findStoryById.getExhibition().getExhibitionImg())
+                    .storyImg(findStoryById.getStoryImg())
                     .exhibitionAddress(findStoryById.getExhibition().getLocation())
                     .exhibitionName(findStoryById.getExhibition().getExhibitionName())
                     .storyOwnerImg(findUserById.getUserImg())
