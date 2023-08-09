@@ -4,7 +4,6 @@ import com.umc.place.common.BaseException;
 import com.umc.place.common.Constant;
 import com.umc.place.story.entity.Story;
 import com.umc.place.story.entity.StoryLike;
-import com.umc.place.story.repository.StoryLikeRepository;
 import com.umc.place.story.repository.StoryRepository;
 import com.umc.place.user.dto.*;
 import com.umc.place.user.entity.Provider;
@@ -97,7 +96,7 @@ public class UserService {
         int year = user.getCreatedDate().getYear();
 
         //내가 작성한 스토리 가져오기
-        Optional <Story> storyList = storyRepository.findFirstByUserOrderByCreatedDateDesc(user);
+        List<Story> storyList = storyRepository.findByUserOrderByCreatedDateDesc(user);
 
         return new GetProfileRes(user.getUserImg(), user.getNickname(), "Hello, " + user.getNickname(), year, storyList);
     }

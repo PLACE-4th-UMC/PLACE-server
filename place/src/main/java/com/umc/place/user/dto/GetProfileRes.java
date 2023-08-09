@@ -15,10 +15,10 @@ public class GetProfileRes {
     private String nickname;
     private String comment;
     private int signupYear;
-    private Optional<Story> storyList;
+    private List<Story> storyList;
 
 
-    public GetProfileRes(String userImg, String nickname, String comment, int signupYear, Optional<Story> storyList) {
+    public GetProfileRes(String userImg, String nickname, String comment, int signupYear, List<Story> storyList) {
         this.userImg = userImg;
         this.nickname = nickname;
         this.comment = comment;
