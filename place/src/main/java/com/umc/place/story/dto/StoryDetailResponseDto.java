@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class StoryDetailResponseDto {
-    private String exhibitionImg;
+    private String storyImg;
     private String exhibitionName;
     private String exhibitionAddress;
 
@@ -22,9 +22,9 @@ public class StoryDetailResponseDto {
     private Boolean isLiked;
 
     @Builder
-    public StoryDetailResponseDto(String exhibitionImg, String exhibitionName, String exhibitionAddress,
+    public StoryDetailResponseDto(String storyImg, String exhibitionName, String exhibitionAddress,
                                   String storyOwnerImg, List<CommentResDto> comments, Boolean isLiked) {
-        this.exhibitionImg = exhibitionImg;
+        this.storyImg = storyImg;
         this.exhibitionName = exhibitionName;
         this.exhibitionAddress = exhibitionAddress;
         this.storyOwnerImg = storyOwnerImg;

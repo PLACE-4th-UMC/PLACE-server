@@ -32,8 +32,7 @@ public class Comment extends BaseEntity {
     private String content;
 
     @Builder
-    public Comment(Long commentIdx, User user, Story story, String content) {
-        this.commentIdx = commentIdx;
+    public Comment(User user, Story story, String content) {
         this.user = user;
         this.story = story;
         story.getComments().add(this); // 양방향 연관관계 메서드

@@ -1,6 +1,7 @@
 package com.umc.place.story.service;
 
 import com.umc.place.comment.dto.CommentResDto;
+import com.umc.place.comment.repository.CommentRepository;
 import com.umc.place.common.BaseException;
 import com.umc.place.exhibition.dto.SearchExhibitionsByNameResDto;
 import com.umc.place.exhibition.entity.Exhibition;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
@@ -36,6 +38,7 @@ public class StoryService {
     private final StoryHistoryRepository storyHistoryRepository;
     private final ExhibitionRepository exhibitionRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public StoryDetailResponseDto getStoryDetail(Long storyIdx, Long userId) throws BaseException {
@@ -65,7 +68,7 @@ public class StoryService {
                     .collect(Collectors.toList());
 
             return StoryDetailResponseDto.builder()
-                    .exhibitionImg(findStoryById.getExhibition().getExhibitionImg())
+                    .storyImg(findStoryById.getStoryImg())
                     .exhibitionAddress(findStoryById.getExhibition().getLocation())
                     .exhibitionName(findStoryById.getExhibition().getExhibitionName())
                     .storyOwnerImg(findUserById.getUserImg())
@@ -121,6 +124,33 @@ public class StoryService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
 
+        }
+    }
+
+    public StoryUploadResponseDto getStoryView(Long userId) throws BaseException {
+        try {
+            User findUser = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            List<StoryHistory> storyHistoryList
+                    = storyHistoryRepository.findFirst4ByUserOrderByLastModifiedDateDesc(findUser);
+            Optional<Story> latestStory = storyRepository
+                    .findFirstByUserOrderByCreatedDateDesc(findUser);
+
+            if (latestStory.isPresent()) {
+                return StoryUploadResponseDto.builder()
+                        .recentStories(storyHistoryList)
+                        .latestStoryImg(latestStory.get().getStoryImg())
+                        .latestStoryName(latestStory.get().getExhibition().getExhibitionName())
+                        .latestStoryLocation(latestStory.get().getExhibition().getLocation())
+                        .build();
+            } else {
+                return StoryUploadResponseDto.builder()
+                        .recentStories(storyHistoryList)
+                        .build();
+            }
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 }
