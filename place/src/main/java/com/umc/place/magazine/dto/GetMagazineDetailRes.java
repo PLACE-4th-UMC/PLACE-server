@@ -9,7 +9,6 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
 public class GetMagazineDetailRes {
     private List<LikeList> likeLists;
@@ -18,7 +17,6 @@ public class GetMagazineDetailRes {
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
-    @Setter
     public static class LikeList{
         private String img;
         private String location;
