@@ -27,9 +27,9 @@ public class FileUploadController {
     private final S3Upload s3Upload;
 
     @PostMapping("/upload")
-    public ResponseEntity<Object> uploadFile(MultipartFile[] multipartFileLis) throws IOException {
+    public ResponseEntity<Object> uploadFile(MultipartFile multipartFile) throws IOException {
         return ResponseEntity.ok(
-                s3Upload.upload(multipartFileLis)
+                s3Upload.upload(multipartFile)
         );
     }
 }

@@ -5,6 +5,8 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.umc.place.common.entity.S3;
+import com.umc.place.common.repository.S3Repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,11 @@ public class S3Upload {
     private String bucket;
 
     private final AmazonS3Client amazonS3Client;
-    ;
+    private final S3Repository s3Repository;
 
     //https://jforj.tistory.com/261
-    public List<String> upload(MultipartFile[] multipartFileList) throws IOException {
-        List<String> imagePathList = new ArrayList<>();
+    public String upload(MultipartFile multipartFile) throws IOException {
 
-        for (MultipartFile multipartFile : multipartFileList) {
             String originalName = multipartFile.getOriginalFilename(); // 파일 이름
             long size = multipartFile.getSize(); // 파일 크기
 
@@ -44,9 +44,9 @@ public class S3Upload {
             );
 
             String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
-            imagePathList.add(imagePath);
-        }
-        return imagePathList;
+            S3 s3 = new S3(imagePath);
+            s3Repository.save(s3);
+        return imagePath;
     }
 }
 
