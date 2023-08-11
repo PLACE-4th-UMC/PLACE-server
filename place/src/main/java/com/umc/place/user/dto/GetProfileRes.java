@@ -19,9 +19,10 @@ public class GetProfileRes {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Story {
+        private Long storyIdx;
         private String storyImg;
-        private String location;
-        private String exhibition;
+        private String exhibitionLocation;
+        private String exhibitionName;
     }
 
 }
