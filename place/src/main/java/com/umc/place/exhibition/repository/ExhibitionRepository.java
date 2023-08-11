@@ -31,6 +31,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long> {
     Page<Exhibition> findByLocationLike(@Param("location") String location, Pageable pageable);
 
 
+
     List<Exhibition> findTop4ByOrderByCreatedDateDesc();
     List<Exhibition> findTop4ByOrderByViewCountDesc();
     List<Exhibition> findTop4ByOrderByLikeCountDesc();

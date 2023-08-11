@@ -30,8 +30,7 @@ public class StoryLike extends BaseEntity {
     private Story story;
 
     @Builder
-    public StoryLike(Long storyLikeIdx, User user, Story story) {
-        this.storyLikeIdx = storyLikeIdx;
+    public StoryLike(User user, Story story) {
         this.user = user;
         this.story = story;
         this.story.getLikes().add(this); // 양방향 연관관계 메서드
