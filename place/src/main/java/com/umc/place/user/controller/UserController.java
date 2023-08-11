@@ -31,42 +31,32 @@ public class UserController {
     //카카오 소셜 로그인
     @ResponseBody
     @PostMapping("/login")
-    public BaseResponse<?> login (@RequestBody LoginRequest loginRequest) throws IOException {
+    public BaseResponse<?> login(@RequestBody LoginRequest loginRequest) throws IOException {
         try{
-            //인가코드 가져와서 카카오에서 access 토큰 받아오기
-            KakaoTokenResponse kakaoTokenResponse = kakaoAuthService.getKakaoToken(loginRequest.getCode());
-            //토큰으로 사용자 정보(식별자) 가져오기
-            String identifier = kakaoAuthService.getKakaoIdentifier(kakaoTokenResponse);
-            PostUserRes postUserRes = userService.login(identifier, "카카오");
-            return new BaseResponse<>(postUserRes);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    //구글 소셜 로그인
-    @ResponseBody
-    @PostMapping("/login/google")
-    public BaseResponse<?> login_google(@RequestBody LoginRequest loginRequest) throws IOException {
-        try{
-            GoogleTokenResponse googleTokenResponse = googleAuthService.getGoogleToken(loginRequest.getCode());
-            String identifier = googleAuthService.getGoogleIdentifier(googleTokenResponse);
-            PostUserRes postUserRes = userService.login(identifier, "구글");
-            return new BaseResponse<>(postUserRes);
-        } catch (BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @ResponseBody
-    @PostMapping("/login/naver")
-    public BaseResponse<?> login_naver(@RequestBody LoginRequest loginRequest) throws IOException {
-        try{
-            //인가 코드, state로 access 토큰 가져오기
-            NaverTokenResponse naverTokenResponse = naverAuthService.getNaverToken(loginRequest.getCode(), loginRequest.getState());
-            String identifier = naverAuthService.getNaverIdentifier(naverTokenResponse);
-            PostUserRes postUserRes = userService.login(identifier, "네이버");
-            return new BaseResponse<>(postUserRes);
+            //카카오 소셜로그인
+            if(loginRequest.getProvider().equals("카카오")){
+                //인가코드 가져와서 카카오에서 access 토큰 받아오기
+                KakaoTokenResponse kakaoTokenResponse = kakaoAuthService.getKakaoToken(loginRequest.getCode());
+                //토큰으로 사용자 정보(식별자) 가져오기
+                String identifier = kakaoAuthService.getKakaoIdentifier(kakaoTokenResponse);
+                PostUserRes postUserRes = userService.login(identifier, "카카오");
+                return new BaseResponse<>(postUserRes);
+            }
+            //구글 소셜로그인
+            else if (loginRequest.getProvider().equals("구글")){
+                GoogleTokenResponse googleTokenResponse = googleAuthService.getGoogleToken(loginRequest.getCode());
+                String identifier = googleAuthService.getGoogleIdentifier(googleTokenResponse);
+                PostUserRes postUserRes = userService.login(identifier, "구글");
+                return new BaseResponse<>(postUserRes);
+            }
+            //네이버 소셜로그인
+            else {
+                //인가 코드, state로 access 토큰 가져오기
+                NaverTokenResponse naverTokenResponse = naverAuthService.getNaverToken(loginRequest.getCode(), loginRequest.getState());
+                String identifier = naverAuthService.getNaverIdentifier(naverTokenResponse);
+                PostUserRes postUserRes = userService.login(identifier, "네이버");
+                return new BaseResponse<>(postUserRes);
+            }
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }

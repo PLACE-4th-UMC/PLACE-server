@@ -43,13 +43,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Date birthday;
 
-    //삭제하기..?
-    @Column(nullable = false)
-    private String accessToken;
-
-    @Column(nullable = false)
-    private String refreshToken;
-
     @Builder
     public User(String identifier, Provider provider) {
         this.identifier = identifier;
