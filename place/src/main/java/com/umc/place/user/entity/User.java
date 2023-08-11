@@ -43,7 +43,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Date birthday;
 
-    //삭제하기
+    //삭제하기..?
     @Column(nullable = false)
     private String accessToken;
 
@@ -64,36 +64,15 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public void storeSignUp(String nickname, String userImg, Provider provider) {
-        this.nickname = nickname;
-        this.userImg = userImg;
-        this.provider = provider;
-    }
-
-    //탈퇴하기
-    public void signout() {
-        this.setNickname("알 수 없음");
-        this.setProfileImg(null);
-        this.setProvider(Provider.ANONYMOUS);
-        this.setStatus("inactive");
-    }
-
-    public void setProfileImg(String userImg) {
-        this.userImg = userImg;
-    }
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-    public void setProvider(Provider provider){
-        this.provider = provider;
-    }
-
-    public void modifyNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
+    public void modifyNickname(String nickname) { this.nickname = nickname; }
     public void modifyUserImg(String userImg) {
         this.userImg = userImg;
+    }
+    public void modifyEmail(String email) {
+        this.email = email;
+    }
+    public void modifyLocation(String location) {
+        this.location = location;
     }
 
     public void logout() {
@@ -102,6 +81,5 @@ public class User extends BaseEntity {
     public void login() {
         this.setStatus("active");
     }
-
 
 }

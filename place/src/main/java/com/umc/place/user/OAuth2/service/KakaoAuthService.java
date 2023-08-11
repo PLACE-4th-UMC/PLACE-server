@@ -39,9 +39,9 @@ public class KakaoAuthService {
     private String KAKAO_USERINFO_REQUEST_URL;
 
     //인가코드로 카카오 토큰 발급받기
-    public KakaoTokenResponse getKakaoToken (String authorizationCode) throws JsonProcessingException {
+    public KakaoTokenResponse getKakaoToken (String code) throws JsonProcessingException {
         Map<String, Object> params = new HashMap<>();
-        params.put("code", authorizationCode);
+        params.put("code", code);
         params.put("client_id", kakaoClientId);
         params.put("redirect_uri", kakaoRedirectUri);
         params.put("grant_type", "authorization_code");
@@ -56,7 +56,7 @@ public class KakaoAuthService {
     }
 
     //카카오 토큰으로 사용자 정보(식별자) 가져오기
-    public String getKakaoUserIdx (KakaoTokenResponse kakaoToken) throws JsonProcessingException {
+    public String getKakaoIdentifier (KakaoTokenResponse kakaoToken) throws JsonProcessingException {
 
         //header에 accessToken 담기
         HttpHeaders headers = new HttpHeaders();
