@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
 
@@ -96,9 +97,25 @@ public class UserService {
         int year = user.getCreatedDate().getYear();
 
         //내가 작성한 스토리 가져오기
-        List<Story> storyList = storyRepository.findByUserOrderByCreatedDateDesc(user);
+        List<GetProfileRes.Story> storyList = getUserStoryList(user);
 
         return new GetProfileRes(user.getUserImg(), user.getNickname(), "Hello, " + user.getNickname(), year, storyList);
+    }
+
+    //스토리 목록 가져오기
+    public List<GetProfileRes.Story> getUserStoryList(User user) {
+        //user가 작성한 story 리스트 가져오기
+        List<Story> userStories = storyRepository.findByUserOrderByCreatedDateDesc(user);
+
+        List<GetProfileRes.Story> storyList = userStories.stream()
+                .map(story -> new GetProfileRes.Story(
+                        story.getStoryIdx(),
+                        story.getStoryImg(),
+                        story.getExhibition().getExhibitionName(),
+                        story.getExhibition().getLocation()))
+                .collect(Collectors.toList());
+
+        return storyList;
     }
 
     //사용자 프로필 수정
