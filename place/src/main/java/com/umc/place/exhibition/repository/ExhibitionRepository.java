@@ -15,7 +15,9 @@ import java.util.List;
 @Repository
 public interface ExhibitionRepository extends JpaRepository<Exhibition, Long> {
     Page<Exhibition> findByCategory(Category category, Pageable pageable); // 카테고리 기반 전체 조회(페이징)
+
     Page<Exhibition> findAll(Pageable pageable); // 전체 조회(페이징)
+
     boolean existsByCategory(Category category);
 
     @Query("select case when count(e) > 0 then true else false end from Exhibition e where Function('replace', e.location, ' ', '') like %:location%")
@@ -32,4 +34,6 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long> {
     List<Exhibition> findTop4ByOrderByCreatedDateDesc();
     List<Exhibition> findTop4ByOrderByViewCountDesc();
     List<Exhibition> findTop4ByOrderByLikeCountDesc();
+
+    Page<Exhibition> findByExhibitionNameContainingOrderByExhibitionName(String searchKeyword, Pageable pageable);
 }
