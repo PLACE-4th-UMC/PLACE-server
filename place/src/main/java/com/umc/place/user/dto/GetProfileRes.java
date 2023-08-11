@@ -1,22 +1,28 @@
 package com.umc.place.user.dto;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-import java.util.Date;
+import java.util.List;
 
 @Data
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class GetProfileRes {
     private String userImg;
     private String nickname;
     private String comment;
     private int signupYear;
+    private List<Story> storyList;
 
-    public GetProfileRes(String userImg, String nickname, String comment, int signupYear) {
-        this.userImg = userImg;
-        this.nickname = nickname;
-        this.comment = comment;
-        this.signupYear = signupYear;
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Story {
+        private Long storyIdx;
+        private String storyImg;
+        private String exhibitionLocation;
+        private String exhibitionName;
     }
+
 }

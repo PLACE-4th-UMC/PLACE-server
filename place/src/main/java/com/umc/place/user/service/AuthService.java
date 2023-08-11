@@ -36,8 +36,8 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
-    // 토큰 추출
-    private String getToken() throws BaseException {
+    // 토큰 추출하기
+    public String getToken() throws BaseException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String token = request.getHeader(REQUEST_HEADER_NAME);
         if (token == null) return null;
