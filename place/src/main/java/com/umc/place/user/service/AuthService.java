@@ -29,22 +29,12 @@ public class AuthService {
 
     @Value("${auth.key}")
     private String key;
-    String CLAIM_NAME = "userIdx";
+    String CLAIM_NAME = "identifier";
     String REQUEST_HEADER_NAME = "Authorization";
     public static final String TOKEN_REGEX = "^Bearer( )*";
     public static final String TOKEN_REPLACEMENT = "";
 
     private final UserRepository userRepository;
-
-    /**
-     * userIdx 필수
-     * @return 있으면 id, 없으면 EXCEPTION
-     */
-    public Long getUserIdx() throws BaseException{
-        String token = getToken();
-        if(token==null) throw new BaseException(NULL_TOKEN);
-        return getClaims(token).getBody().get(CLAIM_NAME, Long.class);
-    }
 
     // 토큰 추출
     private String getToken() throws BaseException {
@@ -74,64 +64,65 @@ public class AuthService {
         return claims;
     }
 
-    //user id로 JWT 토큰 생성
-    public PostUserRes createToken(User user){
-        String accessToken = createAccessToken(user.getUserIdx());
-        String refreshToken = createRefreshToken(user.getUserIdx());
+    //identifier 가져오기
+    public String getIdentifier() throws BaseException{
+        String token = getToken();
+        if(token==null) throw new BaseException(NULL_TOKEN);
+        return getClaims(token).getBody().get(CLAIM_NAME, String.class);
+    }
+
+    //userIdx 가져오기
+    public Long getUserIdx() throws BaseException {
+        String identifier = getIdentifier();
+        User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+        Long userIdx = user.getUserIdx();
+        return userIdx;
+    }
+
+    //소셜로그인 시 받아온 identifier로 JWT 토큰 생성
+    public PostUserRes createToken (User user) {
+        String accessToken = createAccessToken(user.getIdentifier());
+        String refreshToken = createRefreshToken(user.getIdentifier());
         return new PostUserRes(accessToken, refreshToken);
     }
 
-    public String createRefreshToken(Long userIdx){
-        Date now = new Date();
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now.getTime() + refreshTokenExpiryDate))
-                .signWith(SignatureAlgorithm.HS256, key)
-                .compact();
-        redisTemplate.opsForValue().set(String.valueOf(userIdx), refreshToken, Duration.ofMillis(refreshTokenExpiryDate));
-        return refreshToken;
-    }
-    public String createAccessToken(Long userIdx){
+    public String createAccessToken (String identifier) {
         Date now = new Date();
         String accessToken = Jwts.builder()
-                .claim("userIdx", userIdx)
-                .setSubject(userIdx.toString())
+                .claim("identifier", identifier)
+                .setSubject(identifier)
                 .setExpiration(new Date(now.getTime() + accessTokenExpiryDate))
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
         return accessToken;
     }
 
+    public String createRefreshToken (String identifier) {
+        Date now = new Date();
+        String refreshToken = Jwts.builder()
+                .setExpiration(new Date(now.getTime() + refreshTokenExpiryDate))
+                .signWith(SignatureAlgorithm.HS256, key)
+                .compact();
+        redisTemplate.opsForValue().set(String.valueOf(identifier), refreshToken, Duration.ofMillis(refreshTokenExpiryDate));
+        return refreshToken;
+    }
+
     //토큰 재발급 시 사용
-    public String validateRefreshToken(Long userIdx, String refreshTokenReq) throws BaseException {
-        String refreshToken = (String) redisTemplate.opsForValue().get(String.valueOf(userIdx));
+    public String validateRefreshToken (String identifier, String refreshTokenReq) throws BaseException {
+        String refreshToken = redisTemplate.opsForValue().get(String.valueOf(identifier));
+
         if(!refreshToken.equals(refreshTokenReq)) throw new BaseException(INVALID_TOKEN);
         return refreshToken;
     }
 
-    // 회원 로그아웃
-    public void logout(Long userIdx) throws BaseException {
-        deleteToken(userIdx);
-        User user = userRepository.findByUserIdxAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
-        String token = user.getAccessToken();
-        registerBlackList(token, Constant.LOGOUT);
-    }
-
-    // 회원 탈퇴
-    public void signout(Long userIdx) throws BaseException {
-        deleteToken(userIdx);
-        User user = userRepository.findByUserIdxAndStatus(userIdx, "active").orElseThrow(()->new BaseException(INVALID_USER_IDX));
-        String token = user.getAccessToken();
-        registerBlackList(token, Constant.INACTIVE);
-    }
-
     // refreshToken 삭제
-    public void deleteToken(Long userIdx) {
-        String key = String.valueOf(userIdx);
+    public void deleteToken (String identifier) {
+        String key = String.valueOf(identifier);
         if(redisTemplate.opsForValue().get(key)!=null) redisTemplate.delete(key);
     }
 
     // 유효한 토큰(Bearer) blacklist로 등록
-    private void registerBlackList(String token, String status) {
+    public void registerBlackList (String token, String status) {
         token = token.replaceAll(TOKEN_REGEX, TOKEN_REPLACEMENT);
         Date AccessTokenExpiration = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getExpiration();
         long now = (new Date()).getTime();
