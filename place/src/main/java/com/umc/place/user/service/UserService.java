@@ -147,7 +147,7 @@ public class UserService {
             User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
             userRepository.delete(user);
             authService.deleteToken(identifier);
-            String token = user.getAccessToken();
+            String token = authService.getToken();
             authService.registerBlackList(token, Constant.INACTIVE);
         } catch (BaseException e) {
             throw e;
@@ -162,7 +162,7 @@ public class UserService {
         try{
             User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
             authService.deleteToken(identifier);
-            String token = user.getAccessToken();
+            String token = authService.getToken();
             authService.registerBlackList(token, Constant.LOGOUT);
             user.logout();
         } catch (BaseException e){
