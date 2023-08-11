@@ -1,9 +1,6 @@
 package com.umc.place.user.dto;
 
-import com.umc.place.story.entity.Story;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,5 +13,15 @@ public class GetProfileRes {
     private String comment;
     private int signupYear;
     private List<Story> storyList;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Story {
+        private String storyImg;
+        private String location;
+        private String exhibition;
+    }
 
 }
