@@ -123,7 +123,7 @@ public class ExhibitionService {
                 User user = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
                 storyList = getStoryList(exhibition, user);
             } else storyList = getStoryListAnonymous(exhibition);
-            // TODO: S3 설정 완료 후 이미지 가져오는 부분 수정 필요
+            //TODO: S3 설정 완료 후 이미지 조회 부분 수정
             return new GetExhibitionDetailRes(
                     exhibition.getExhibitionName(),
                     exhibition.getStartDate(),
