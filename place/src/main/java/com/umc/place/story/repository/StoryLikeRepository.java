@@ -11,5 +11,8 @@ import java.util.List;
 @Repository
 public interface StoryLikeRepository extends JpaRepository<StoryLike, Long> {
     Boolean existsByUserAndStory(User user, Story story);
+
+    StoryLike findByUserAndStory(User user, Story story);
+
     List<StoryLike> findByUser(User user);
 }
