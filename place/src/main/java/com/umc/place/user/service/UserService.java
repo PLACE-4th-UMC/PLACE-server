@@ -146,7 +146,7 @@ public class UserService {
             authService.deleteToken(identifier);
             String token = authService.getToken();
             authService.registerBlackList(token, INACTIVE);
-            user.signout();
+            user.signout(); //status inactive로 바꾸기
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class UserService {
             authService.deleteToken(identifier);
             String token = authService.getToken();
             authService.registerBlackList(token, LOGOUT);
-            user.logout();
+            user.logout(); //status logout으로 바꾸기
         } catch (BaseException e){
             throw e;
         } catch (Exception e) {
@@ -170,7 +170,7 @@ public class UserService {
         }
     }
 
-    // AccessToken 재발급
+    // Token 재발급
     @Transactional
     public PostUserRes reissueToken (PostTokenReq postTokenReq) throws BaseException {
         User user = userRepository.findByIdentifierAndStatus(postTokenReq.getIdentifier(),ACTIVE)

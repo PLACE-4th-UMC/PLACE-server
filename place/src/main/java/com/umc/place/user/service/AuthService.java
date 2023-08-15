@@ -22,11 +22,15 @@ import static com.umc.place.common.Constant.*;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final int accessTokenExpiryDate = 604800000;
-    private final int refreshTokenExpiryDate = 604800000;
+    //유효기간 이후에 수정하기
+    //access token 24시간 이내
+    private final int accessTokenExpiryDate = 604800000; // 7일
+    //refresh token 1주-2주
+    private final int refreshTokenExpiryDate = 604800000; // 7일
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    //JWT key
     @Value("${auth.key}")
     private String key;
     String CLAIM_NAME = "identifier";
@@ -40,7 +44,9 @@ public class AuthService {
     public String getToken() throws BaseException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String token = request.getHeader(REQUEST_HEADER_NAME);
+        //토큰 전송되지 않았을 경우
         if (token == null) return null;
+        //로그아웃된 상태나 탈퇴한 토큰
         if(redisTemplate.opsForValue().get(token)!=null) throw new BaseException(INVALID_TOKEN);
         return token;
     }
@@ -103,22 +109,23 @@ public class AuthService {
                 .setExpiration(new Date(now.getTime() + refreshTokenExpiryDate))
                 .signWith(SignatureAlgorithm.HS256, key)
                 .compact();
-        redisTemplate.opsForValue().set(String.valueOf(identifier), refreshToken, Duration.ofMillis(refreshTokenExpiryDate));
+        redisTemplate.opsForValue().set(identifier, refreshToken, Duration.ofMillis(refreshTokenExpiryDate));
         return refreshToken;
     }
 
-    //토큰 재발급 시 사용
+    //유효성 검사 (토큰 재발급 시 사용)
     public String validateRefreshToken (String identifier, String refreshTokenReq) throws BaseException {
-        String refreshToken = redisTemplate.opsForValue().get(String.valueOf(identifier));
+        String refreshToken = redisTemplate.opsForValue().get(identifier);
 
         if(!refreshToken.equals(refreshTokenReq)) throw new BaseException(INVALID_TOKEN);
         return refreshToken;
     }
 
-    // refreshToken 삭제
-    public void deleteToken (String identifier) {
-        String key = String.valueOf(identifier);
-        if(redisTemplate.opsForValue().get(key)!=null) redisTemplate.delete(key);
+    // redis에서 refreshToken 삭제
+    public void deleteToken(String identifier) {
+        if (redisTemplate.opsForValue().get(identifier) != null) {
+            redisTemplate.delete(identifier);
+        }
     }
 
     // 유효한 토큰(Bearer) blacklist로 등록
