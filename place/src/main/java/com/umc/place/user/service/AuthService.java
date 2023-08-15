@@ -1,7 +1,6 @@
 package com.umc.place.user.service;
 
 import com.umc.place.common.BaseException;
-import com.umc.place.common.Constant;
 import com.umc.place.user.dto.PostUserRes;
 import com.umc.place.user.entity.User;
 import com.umc.place.user.repository.UserRepository;
@@ -18,6 +17,7 @@ import java.time.Duration;
 import java.util.Date;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.*;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +74,7 @@ public class AuthService {
     //userIdx 가져오기
     public Long getUserIdx() throws BaseException {
         String identifier = getIdentifier();
-        User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+        User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
         Long userIdx = user.getUserIdx();
         return userIdx;
     }
