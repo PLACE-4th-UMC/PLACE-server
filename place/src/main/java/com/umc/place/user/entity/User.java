@@ -10,6 +10,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
+import static com.umc.place.common.Constant.*;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -69,10 +71,11 @@ public class User extends BaseEntity {
     }
 
     public void logout() {
-        this.setStatus("logout");
+        this.setStatus(LOGOUT);
     }
+    public void signout() { this.setStatus(INACTIVE); }
     public void login() {
-        this.setStatus("active");
+        this.setStatus(ACTIVE);
     }
 
 }
