@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.INVALID_USER_IDX;
+import static com.umc.place.common.Constant.ACTIVE;
 
 
 @Service
@@ -27,7 +28,7 @@ public class MagazineService {
     private final StoryLikeRepository storyLikeRepository;
     public GetMagazineDetailRes getMagazineDetail(Long userIdx) throws BaseException {
 
-        User user = userRepository.findById(userIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+        User user = userRepository.findByUserIdxAndStatusEquals(userIdx,ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
         List<StoryLike> storyLike = storyLikeRepository.findByUser(user);
         List<ExhibitionLike> exhibitionLike = exhibitionLikeRepository.findByUser(user);
 

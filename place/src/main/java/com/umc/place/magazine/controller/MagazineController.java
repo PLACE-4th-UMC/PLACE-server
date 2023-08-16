@@ -16,6 +16,7 @@ public class MagazineController {
     @ResponseBody
     @GetMapping("/{userIdx}")
     public BaseResponse<GetMagazineDetailRes> getMagazineDetailRes(@PathVariable Long userIdx) throws BaseException {
+        System.out.println("userIdx = " + userIdx);
         return new BaseResponse<>(magazineService.getMagazineDetail(userIdx));
     }
 
