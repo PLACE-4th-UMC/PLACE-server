@@ -45,10 +45,22 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Date birthday;
 
+    @Column(nullable = false)
+    private String accessToken;
+
+    @Column(nullable = false)
+    private String refreshToken;
+
     @Builder
-    public User(String identifier, Provider provider) {
+    public User(String identifier, String nickname, String email, String location, Provider provider, Date birthday, String accessToken, String refreshToken) {
         this.identifier = identifier;
+        this.nickname = nickname;
+        this.email = email;
+        this.location = location;
         this.provider = provider;
+        this.birthday = birthday;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public void signup(String nickname, String userImg, Date birthday, String location, String email){
@@ -60,19 +72,11 @@ public class User extends BaseEntity {
     }
 
     public void modifyNickname(String nickname) { this.nickname = nickname; }
-    public void modifyUserImg(String userImg) {
-        this.userImg = userImg;
-    }
-    public void modifyEmail(String email) {
-        this.email = email;
-    }
-    public void modifyLocation(String location) {
-        this.location = location;
-    }
+    public void modifyUserImg(String userImg) { this.userImg = userImg; }
+    public void modifyEmail(String email) { this.email = email; }
+    public void modifyLocation(String location) { this.location = location; }
 
-    public void logout() {
-        this.setStatus(LOGOUT);
-    }
+    public void logout() { this.setStatus(LOGOUT); }
     public void signout() { this.setStatus(INACTIVE); }
     public void login() {
         this.setStatus(ACTIVE);

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,13 @@ public class UserService {
         //userIdx는 자동 생성
         User newuser = User.builder()
                 .identifier(identifier)
+                .nickname("default")
+                .email("default")
+                .location("default")
                 .provider(provider)
+                .birthday(new Date(0))
+                .accessToken("access")
+                .refreshToken("refresh")
                 .build();
         return userRepository.save(newuser);
     }
