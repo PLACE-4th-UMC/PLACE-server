@@ -45,10 +45,10 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Date birthday;
 
-    @Column(nullable = false)
+    @Column
     private String accessToken;
 
-    @Column(nullable = false)
+    @Column
     private String refreshToken;
 
     @Builder
@@ -59,8 +59,6 @@ public class User extends BaseEntity {
         this.location = location;
         this.provider = provider;
         this.birthday = birthday;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 
     public void signup(String nickname, String userImg, Date birthday, String location, String email){

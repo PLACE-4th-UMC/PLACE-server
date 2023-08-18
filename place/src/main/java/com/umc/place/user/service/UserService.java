@@ -63,8 +63,6 @@ public class UserService {
                 .location("default")
                 .provider(provider)
                 .birthday(new Date(0))
-                .accessToken("access")
-                .refreshToken("refresh")
                 .build();
         return userRepository.save(newuser);
     }
