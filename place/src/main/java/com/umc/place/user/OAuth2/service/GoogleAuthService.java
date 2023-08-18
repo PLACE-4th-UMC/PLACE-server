@@ -71,7 +71,7 @@ public class GoogleAuthService {
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
 
         //user id 가져오기
-        String identifier = jsonNode.get("sub").asText();
+        String identifier = jsonNode.get("id").asText();
 
         return identifier;
     }
