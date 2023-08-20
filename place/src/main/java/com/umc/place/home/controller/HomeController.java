@@ -19,18 +19,18 @@ public class HomeController {
     private final HomeService homeService;
 
     @ResponseBody
-    @GetMapping("userDetails")
-    public BaseResponse<GetHomeUserDetailsRes> getHomeUserRecentDetail(){
-        return new BaseResponse<>(homeService.getHomeUserRecentDetail(),homeService.getHomeUserLikeDetailRes(),homeService.getHomeUserViewDetailRes());
+    @GetMapping("userRecent")
+    public BaseResponse<GetHomeUserRecentDetailRes> getHomeUserRecentDetail(){
+        return new BaseResponse<>(homeService.getHomeUserRecentDetail());
     }
-//    @ResponseBody
-//    @GetMapping("userView")
-//    public BaseResponse<GetHomeUserViewDetailRes> getHomeUserViewDetailRes(){
-//        return new BaseResponse<>(homeService.getHomeUserViewDetailRes());
-//    }
-//    @ResponseBody
-//    @GetMapping("userLike")
-//    public BaseResponse<GetHomeUserLikeDetailRes> getHomeUserLikeDetailRes(){
-//        return new BaseResponse<>(homeService.getHomeUserLikeDetailRes());
-//    }
+    @ResponseBody
+    @GetMapping("userView")
+    public BaseResponse<GetHomeUserViewDetailRes> getHomeUserViewDetailRes(){
+        return new BaseResponse<>(homeService.getHomeUserViewDetailRes());
+    }
+    @ResponseBody
+    @GetMapping("userLike")
+    public BaseResponse<GetHomeUserLikeDetailRes> getHomeUserLikeDetailRes(){
+        return new BaseResponse<>(homeService.getHomeUserLikeDetailRes());
+    }
 }
