@@ -1,9 +1,7 @@
 package com.umc.place.user.service;
 
 import com.umc.place.common.BaseException;
-import com.umc.place.common.Constant;
 import com.umc.place.story.entity.Story;
-import com.umc.place.story.entity.StoryLike;
 import com.umc.place.story.repository.StoryRepository;
 import com.umc.place.user.dto.*;
 import com.umc.place.user.entity.Provider;
@@ -14,10 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.*;
 
 @Service
 @RequiredArgsConstructor //생성자 자동 생성
@@ -46,7 +44,7 @@ public class UserService {
         if (user == null)
             user = signup(identifier, provider);
         //탈퇴한 회원일 경우
-        if (user.getStatus().equals("inactive"))
+        if (user.getStatus().equals(INACTIVE))
             throw new BaseException(ALREADY_WITHDRAW_USER);
         //기존 회원이면 로그인 처리
         user.login(); //user status active로 바꾸기
@@ -69,7 +67,7 @@ public class UserService {
     public PostUserRes signup_UserInfo(String identifier, PostNewUserReq postNewUserReq) throws BaseException {
         try{
             //identifier로 해당 user 찾기
-            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(()->new BaseException(INVALID_IDENTIFIER));
+            User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(()->new BaseException(INVALID_IDENTIFIER));
             user.signup(postNewUserReq.getNickname(), postNewUserReq.getUserImg(), postNewUserReq.getBirthday(), postNewUserReq.getLocation(), postNewUserReq.getEmail());
             userRepository.save(user); //repository에 저장
             //access token, refresh token
@@ -93,7 +91,7 @@ public class UserService {
     //마이페이지 조회
     public GetProfileRes getProfile() throws BaseException {
         String identifier = authService.getIdentifier();
-        User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+        User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
         int year = user.getCreatedDate().getYear();
 
         //내가 작성한 스토리 가져오기
@@ -122,7 +120,7 @@ public class UserService {
     @Transactional
     public void modifyProfile(String identifier, PatchProfileReq patchProfileReq) throws BaseException {
         try{
-            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+            User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
 
             if(patchProfileReq.getNickname() != null)
                 user.modifyNickname(patchProfileReq.getNickname());
@@ -144,11 +142,11 @@ public class UserService {
     @Transactional(rollbackFor = Exception.class)
     public void signout(String identifier) throws BaseException {
         try{
-            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
-            userRepository.delete(user);
+            User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
             authService.deleteToken(identifier);
             String token = authService.getToken();
-            authService.registerBlackList(token, Constant.INACTIVE);
+            authService.registerBlackList(token, INACTIVE);
+            user.signout(); //status inactive로 바꾸기
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
@@ -160,11 +158,11 @@ public class UserService {
     @Transactional
     public void logout (String identifier) throws BaseException {
         try{
-            User user = userRepository.findByIdentifierAndStatus(identifier, "active").orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
+            User user = userRepository.findByIdentifierAndStatus(identifier, ACTIVE).orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
             authService.deleteToken(identifier);
             String token = authService.getToken();
-            authService.registerBlackList(token, Constant.LOGOUT);
-            user.logout();
+            authService.registerBlackList(token, LOGOUT);
+            user.logout(); //status logout으로 바꾸기
         } catch (BaseException e){
             throw e;
         } catch (Exception e) {
@@ -172,14 +170,13 @@ public class UserService {
         }
     }
 
-    // AccessToken 재발급
+    // Token 재발급
     @Transactional
     public PostUserRes reissueToken (PostTokenReq postTokenReq) throws BaseException {
-        User user = userRepository.findByIdentifierAndStatus(postTokenReq.getIdentifier(),"active")
+        User user = userRepository.findByIdentifierAndStatus(postTokenReq.getIdentifier(),ACTIVE)
                 .orElseThrow(() -> new BaseException(INVALID_IDENTIFIER));
         authService.validateRefreshToken(user.getIdentifier(), postTokenReq.getRefreshToken());
         return authService.createToken(user);
     }
-
 
 }
