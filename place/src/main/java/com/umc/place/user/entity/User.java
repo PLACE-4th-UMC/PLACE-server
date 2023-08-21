@@ -78,4 +78,8 @@ public class User extends BaseEntity {
         this.setStatus(ACTIVE);
     }
 
+    public void setUserImg(String userImg){
+        this.userImg = userImg;
+    }
+
 }
