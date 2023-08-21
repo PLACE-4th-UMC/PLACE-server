@@ -6,12 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.place.user.OAuth2.dto.KakaoTokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,23 +30,31 @@ public class KakaoAuthService {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    @Value("${spring.OAuth2.kakao.url.token}")
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String KAKAO_TOKEN_REQUEST_URL;
 
-    @Value("${spring.OAuth2.kakao.url.profile}")
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USERINFO_REQUEST_URL;
 
     //인가코드로 카카오 토큰 발급받기
     public KakaoTokenResponse getKakaoToken (String code) throws JsonProcessingException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("code", code);
-        params.put("client_id", kakaoClientId);
-        params.put("redirect_uri", kakaoRedirectUri);
-        params.put("grant_type", "authorization_code");
+        // Set Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Accept", "application/json");
+
+        // Set parameter
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", kakaoClientId);
+        params.add("redirect_uri", kakaoRedirectUri);
+        params.add("code", code);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(KAKAO_TOKEN_REQUEST_URL,
-                params, String.class);
+
+        // Set http entity
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(KAKAO_TOKEN_REQUEST_URL, request, String.class);
 
         ObjectMapper objectMapper = new ObjectMapper();
         KakaoTokenResponse kakaoOAuthToken = objectMapper.readValue(response.getBody(), KakaoTokenResponse.class);
