@@ -90,7 +90,7 @@ public class StoryController {
     public BaseResponse<StoryUploadResponseDto> getStoryUploadView() {
         try {
             StoryUploadResponseDto storyView = storyService.getStoryView(authService.getUserIdx());
-            if (storyView.getLatestExhibitionName().isBlank()) { // 유저가 스토리를 업로드하지 않았다면
+            if (storyView.getLatestExhibitionName() == null) { // 유저가 스토리를 업로드하지 않았다면
                 return new BaseResponse<>(storyView, NULL_STORY);
             }
             return new BaseResponse<>(storyView);
