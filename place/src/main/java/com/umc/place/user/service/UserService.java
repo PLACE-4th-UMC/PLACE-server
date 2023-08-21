@@ -8,6 +8,7 @@ import com.umc.place.user.entity.Provider;
 import com.umc.place.user.entity.User;
 import com.umc.place.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import static com.umc.place.common.Constant.*;
 
 @Service
 @RequiredArgsConstructor //생성자 자동 생성
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -40,15 +42,17 @@ public class UserService {
     }
 
     private PostUserRes signUpOrLogin(String identifier, Provider provider) throws BaseException {
-        User user = userRepository.findByIdentifierAndProvider(identifier, provider);
+        User user = userRepository.findByIdentifierAndProvider(identifier, provider).orElse(null);
         //기존 회원이 아닐 경우 회원가입
         if (user == null)
             user = signup(identifier, provider);
         //탈퇴한 회원일 경우
-        if (user.getStatus().equals(INACTIVE))
+        else if (user.getStatus().equals(INACTIVE))
             throw new BaseException(ALREADY_WITHDRAW_USER);
         //기존 회원이면 로그인 처리
-        user.login(); //user status active로 바꾸기
+        else
+            user.setStatus(ACTIVE); //user status active로 바꾸기
+
         userRepository.save(user); //userRepository에 user 저장
         return authService.createToken(user); //user의 JWT access token, refresh token 반환
     }
@@ -63,8 +67,11 @@ public class UserService {
                 .location("default")
                 .provider(provider)
                 .birthday(new Date(0))
+                .accessToken("access")
+                .refreshToken("refresh")
                 .build();
-        return userRepository.save(newuser);
+        newuser.setStatus(ACTIVE);
+        return newuser;
     }
 
     //회원 가입 후 사용자 정보 입력

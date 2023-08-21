@@ -59,6 +59,8 @@ public class User extends BaseEntity {
         this.location = location;
         this.provider = provider;
         this.birthday = birthday;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public void signup(String nickname, String userImg, Date birthday, String location, String email){
@@ -76,8 +78,5 @@ public class User extends BaseEntity {
 
     public void logout() { this.setStatus(LOGOUT); }
     public void signout() { this.setStatus(INACTIVE); }
-    public void login() {
-        this.setStatus(ACTIVE);
-    }
 
 }
