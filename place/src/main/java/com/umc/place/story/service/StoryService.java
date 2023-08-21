@@ -50,9 +50,24 @@ public class StoryService {
                     = storyRepository.findById(storyIdx).orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
 
             User findUserById = null;
+            Boolean isLiked = null;
+
             // 회원 - record history
             if (userId != null) {
                 findUserById = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+                // isLiked
+                Boolean isExists = storyLikeRepository.existsByUserAndStory(findUserById, findStoryById);
+                if (isExists) {
+                    StoryLike storyLike = storyLikeRepository.findByUserAndStory(findUserById, findStoryById);
+                    if (storyLike.getStatus().equals(ACTIVE)) { // active
+                        isLiked = true;
+                    } else {    // inactive
+                        isLiked = false;
+                    }
+                } else { // 아직 생성 안됨
+                    isLiked = false;
+                }
 
                 // update history
                 Boolean existsByUserAndStory
@@ -80,8 +95,7 @@ public class StoryService {
                     .exhibitionName(findStoryById.getExhibition().getExhibitionName())
                     .storyOwnerImg(findStoryById.getUser().getUserImg())
                     .comments(commentDtos)
-                    .isLiked(
-                            (userId == null) ? null : storyLikeRepository.existsByUserAndStory(findUserById, findStoryById))
+                    .isLiked(isLiked)
                     .build();
         } catch (BaseException e) {
             throw e;
