@@ -122,7 +122,7 @@ public class StoryService {
 
             return StoryUploadResponseDto.builder()
                     .latestStoryImg(savedStory.getStoryImg())
-                    .latestStoryName(savedStory.getExhibition().getExhibitionName())
+                    .latestExhibitionName(savedStory.getExhibition().getExhibitionName())
                     .latestStoryLocation(savedStory.getExhibition().getLocation())
                     .recentStories(dateDesc)
                     .build();
@@ -147,7 +147,7 @@ public class StoryService {
                 return StoryUploadResponseDto.builder()
                         .recentStories(storyHistoryList)
                         .latestStoryImg(latestStory.get().getStoryImg())
-                        .latestStoryName(latestStory.get().getExhibition().getExhibitionName())
+                        .latestExhibitionName(latestStory.get().getExhibition().getExhibitionName())
                         .latestStoryLocation(latestStory.get().getExhibition().getLocation())
                         .build();
             } else {
