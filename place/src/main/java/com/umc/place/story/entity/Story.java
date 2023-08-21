@@ -49,4 +49,7 @@ public class Story extends BaseEntity {
         this.exhibition = exhibition;
         this.storyImg = storyImg;
     }
+    public void setStoryImg(String storyImg){
+        this.storyImg = storyImg;
+    }
 }

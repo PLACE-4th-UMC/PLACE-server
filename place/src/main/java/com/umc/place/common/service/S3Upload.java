@@ -1,19 +1,24 @@
 package com.umc.place.common.service;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.umc.place.common.BaseException;
+import com.umc.place.story.entity.Story;
+import com.umc.place.story.repository.StoryRepository;
+import com.umc.place.user.entity.User;
+import com.umc.place.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+
+import static com.umc.place.common.BaseResponseStatus.INVALID_USER_IDX;
+import static com.umc.place.common.Constant.ACTIVE;
 
 @RequiredArgsConstructor
 @Service
@@ -23,57 +28,36 @@ public class S3Upload {
     private String bucket;
 
     private final AmazonS3Client amazonS3Client;
-    ;
+    private final UserRepository userRepository;
+    private final StoryRepository storyRepository;
 
     //https://jforj.tistory.com/261
-    public List<String> upload(MultipartFile[] multipartFileList) throws IOException {
-        List<String> imagePathList = new ArrayList<>();
+    public void upload(MultipartFile multipartFile, String location,Long idx) throws IOException, BaseException {
 
-        for (MultipartFile multipartFile : multipartFileList) {
-            String originalName = multipartFile.getOriginalFilename(); // 파일 이름
-            long size = multipartFile.getSize(); // 파일 크기
+        String originalName = UUID.randomUUID() + multipartFile.getOriginalFilename(); // 파일 이름
+        long size = multipartFile.getSize(); // 파일 크기
 
-            ObjectMetadata objectMetaData = new ObjectMetadata();
-            objectMetaData.setContentType(multipartFile.getContentType());
-            objectMetaData.setContentLength(size);
+        ObjectMetadata objectMetaData = new ObjectMetadata();
+        objectMetaData.setContentType(multipartFile.getContentType());
+        objectMetaData.setContentLength(size);
 
-            // S3에 업로드
-            amazonS3Client.putObject(
-                    new PutObjectRequest(bucket, originalName, multipartFile.getInputStream(), objectMetaData)
-                            .withCannedAcl(CannedAccessControlList.PublicRead)
-            );
+        // S3에 업로드
+        amazonS3Client.putObject(
+                new PutObjectRequest(bucket, originalName, multipartFile.getInputStream(), objectMetaData)
+                        .withCannedAcl(CannedAccessControlList.PublicRead)
+        );
+        String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
+        System.out.println("imagePath = " + imagePath);
 
-            String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
-            imagePathList.add(imagePath);
+        if (location.equals("profile")) { // 프로필일 경우
+            User user = userRepository.findByUserIdxAndStatusEquals(idx,ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 유저에 저장
+            user.setUserImg(imagePath);
         }
-        return imagePathList;
+        if (location.equals("story")) { // 스토리일 경우
+            Story story = storyRepository.findById(idx).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 스토리에 저장
+            story.setStoryImg(imagePath);
+        }
     }
 }
 
-//        String s3FileName = UUID.randomUUID() + "-" + multipartFile.getOriginalFilename();
-//
-//        ObjectMetadata objMeta = new ObjectMetadata();
-//        objMeta.setContentLength(multipartFile.getInputStream().available());
-//
-//        amazonS3.putObject(bucket, s3FileName, multipartFile.getInputStream(), objMeta);
-//
-//        return amazonS3.getUrl(bucket, s3FileName).toString();
-//    for(MultipartFile multipartFile: multipartFileList) {
-//        String originalName = multipartFile.getOriginalFilename(); // 파일 이름
-//        long size = multipartFile.getSize(); // 파일 크기
-//
-//        ObjectMetadata objectMetaData = new ObjectMetadata();
-//        objectMetaData.setContentType(multipartFile.getContentType());
-//        objectMetaData.setContentLength(size);
-//
-//        // S3에 업로드
-//        amazonS3Client.putObject(
-//                new PutObjectRequest(S3Bucket, originalName, multipartFile.getInputStream(), objectMetaData)
-//                        .withCannedAcl(CannedAccessControlList.PublicRead)
-//        );
-//
-//        String imagePath = amazonS3Client.getUrl(S3Bucket, originalName).toString(); // 접근가능한 URL 가져오기
-//        imagePathList.add(imagePath);
-//    }
-//
-//		return new ResponseEntity<Object>(imagePathList, HttpStatus.OK);
+
