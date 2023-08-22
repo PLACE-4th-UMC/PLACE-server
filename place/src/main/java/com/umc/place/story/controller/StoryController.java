@@ -29,7 +29,6 @@ public class StoryController {
     private final StoryService storyService;
     private final CommentService commentService;
     private final AuthService authService;
-
     private final S3Upload s3Upload;
 
     @PostMapping("")
@@ -48,6 +47,10 @@ public class StoryController {
     @GetMapping("/{storyIdx}")
     public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx) {
         try {
+            Long loginUserId = null;
+            if (authService.isMember()) {
+                loginUserId = authService.getUserIdx();
+            }
             return new BaseResponse<>(storyService.getStoryDetail(storyIdx, authService.getUserIdx()));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
