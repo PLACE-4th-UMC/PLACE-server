@@ -10,6 +10,7 @@ import com.umc.place.story.dto.StoryDetailResponseDto;
 import com.umc.place.story.dto.StoryUploadRequestDto;
 import com.umc.place.story.dto.StoryUploadResponseDto;
 import com.umc.place.story.service.StoryService;
+import com.umc.place.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,6 +26,7 @@ public class StoryController {
 
     private final StoryService storyService;
     private final CommentService commentService;
+    private final AuthService authService;
 
     @PostMapping("")
     public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto,
@@ -62,6 +64,17 @@ public class StoryController {
                                                                 @RequestParam Long userId) {
         try {
             return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, userId));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @DeleteMapping("{storyIdx}/{commentIdx}")
+    public BaseResponse<Void> deleteStoryComment(@PathVariable Long storyIdx,
+                                                 @PathVariable Long commentIdx) {
+        try {
+            // TODO: 로그인 확인 로직 추가 - 비로그인 상태면 접근 막기
+            return new BaseResponse<>(commentService.deleteComment(storyIdx, commentIdx, authService.getUserIdx()));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
