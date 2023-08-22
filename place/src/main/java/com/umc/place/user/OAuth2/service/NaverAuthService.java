@@ -6,12 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.place.user.OAuth2.dto.NaverTokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,28 +26,31 @@ public class NaverAuthService {
     @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String naverClientSecret;
 
-    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
-    private String naverRedirectUri;
-
-    @Value("${spring.OAuth2.naver.url.token}")
+    @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
     private String NAVER_TOKEN_REQUEST_URL;
 
-    @Value("${spring.OAuth2.naver.url.profile}")
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String NAVER_USERINFO_REQUEST_URL;
 
     //인가코드로 토큰 발급받기
     public NaverTokenResponse getNaverToken (String code, String state) throws JsonProcessingException {
-        Map<String, Object> params = new HashMap<>();
-        params.put("grant_type", "code");
-        params.put("client_id", naverClientId);
-        params.put("client_secret", naverClientSecret);
-        params.put("redirect_uri", naverRedirectUri);
-        params.put("code", code);
-        params.put("state", state);
+        // Set Header
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        // Set parameter
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", naverClientId);
+        params.add("client_secret", naverClientSecret);
+        params.add("code", code);
+        params.add("state", state);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.postForEntity(NAVER_TOKEN_REQUEST_URL,
-                params, String.class);
+
+        // Set http entity
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = restTemplate.exchange(NAVER_TOKEN_REQUEST_URL, HttpMethod.POST, request, String.class);
 
         ObjectMapper objectMapper = new ObjectMapper();
         NaverTokenResponse naverOAuthToken = objectMapper.readValue(response.getBody(), NaverTokenResponse.class);
@@ -72,7 +73,7 @@ public class NaverAuthService {
         JsonNode jsonNode = objectMapper.readTree(response.getBody());
 
         //user id 가져오기
-        String identifier = jsonNode.get("id").asText();
+        String identifier = jsonNode.get("response").get("id").asText();
 
         return identifier;
     }
