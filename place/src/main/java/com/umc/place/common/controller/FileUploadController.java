@@ -25,10 +25,10 @@ public class FileUploadController {
 
     private final S3Upload s3Upload;
 
-    @PostMapping("/upload/{location}/{idx}")
-    public BaseResponse<Object> uploadFile(MultipartFile multipartFile, @PathVariable String location, @PathVariable Long idx) throws IOException, BaseException {
-        s3Upload.upload(multipartFile,location,idx);
-        return new BaseResponse<>(ResponseEntity.ok("업로드 성공"));
+    @PostMapping("/upload/{location}")
+    public BaseResponse<Object> uploadFile(MultipartFile multipartFile, @PathVariable String location) throws IOException, BaseException {
+
+        return new BaseResponse<>(s3Upload.upload(multipartFile,location));
     }
 
 
