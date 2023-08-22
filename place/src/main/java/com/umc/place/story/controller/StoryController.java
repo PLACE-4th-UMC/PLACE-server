@@ -34,6 +34,9 @@ public class StoryController {
     @PostMapping("")
     public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto) {
         try {
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
             String imgPath = s3Upload.upload(storyUploadRequestDto.getImgFile(), "story");
             return new BaseResponse<>(
                     storyService.uploadStory(storyUploadRequestDto, authService.getUserIdx(), imgPath));
@@ -72,6 +75,9 @@ public class StoryController {
     public BaseResponse<CommentUploadResDto> uploadStoryComment(@PathVariable Long storyIdx,
                                                                 @RequestBody CommentUploadReqDto reqDto) {
         try {
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
             return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, authService.getUserIdx()));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -81,6 +87,9 @@ public class StoryController {
     @PostMapping("/{storyIdx}/like")
     public BaseResponse<Void> likeStory(@PathVariable Long storyIdx) {
         try {
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
             storyService.likeStory(storyIdx, authService.getUserIdx());
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
@@ -91,6 +100,9 @@ public class StoryController {
     @GetMapping("/uploadView")
     public BaseResponse<StoryUploadResponseDto> getStoryUploadView() {
         try {
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
             StoryUploadResponseDto storyView = storyService.getStoryView(authService.getUserIdx());
             if (storyView.getLatestExhibitionName() == null) { // 유저가 스토리를 업로드하지 않았다면
                 return new BaseResponse<>(storyView, NULL_STORY);
