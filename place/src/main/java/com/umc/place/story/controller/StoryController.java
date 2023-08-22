@@ -35,10 +35,9 @@ public class StoryController {
     @PostMapping("")
     public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto) {
         try {
-            // TODO: upload의 idx 부분, storyImgUrl 변경 필요
-            s3Upload.upload(storyUploadRequestDto.getImgFile(), "story", 1L);
+            String imgPath = s3Upload.upload(storyUploadRequestDto.getImgFile(), "story");
             return new BaseResponse<>(
-                    storyService.uploadStory(storyUploadRequestDto, authService.getUserIdx(), ""));
+                    storyService.uploadStory(storyUploadRequestDto, authService.getUserIdx(), imgPath));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         } catch (IOException e) {
