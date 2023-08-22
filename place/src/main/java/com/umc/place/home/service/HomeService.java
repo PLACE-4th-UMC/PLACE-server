@@ -35,18 +35,23 @@ public class HomeService {
     }
 
     public GetHomeUserViewDetailRes getHomeUserViewDetailRes() {
-        List<Exhibition> userViewList = storyRepository.findTop4ByOrderByViewCountDesc();
-        List<GetHomeUserViewDetailRes.UserViewList> getuserViewList = userViewList.stream()
-                .map(userView -> new GetHomeUserViewDetailRes.UserViewList(userView.getExhibitionImg(), userView.getExhibitionName(), userView.getLocation(), userView.getArtist()))
+//        List<Exhibition> userViewList = storyRepository.findTop4ByOrderByViewCountDesc();
+//        List<GetHomeUserViewDetailRes.UserViewList> getuserViewList = userViewList.stream()
+//                .map(userView -> new GetHomeUserViewDetailRes.UserViewList(userView.getExhibitionImg(), userView.getExhibitionName(), userView.getLocation(), userView.getArtist()))
+//                .collect(Collectors.toList());
+//        return new GetHomeUserViewDetailRes(getuserViewList);
+        List<Story> userViewList = storyRepository.findTop4ByOrderByViewCountDesc();
+        List<GetHomeUserViewDetailRes.UserViewList> getUserViewList = userViewList.stream()
+                .map(userView -> new GetHomeUserViewDetailRes.UserViewList(userView.getExhibition().getExhibitionImg(), userView.getUser().getUserImg(), userView.getExhibition().getLocation(), userView.getUser().getNickname()))
                 .collect(Collectors.toList());
-        return new GetHomeUserViewDetailRes(getuserViewList);
+        return new GetHomeUserViewDetailRes(getUserViewList);
     }
 
     public GetHomeUserLikeDetailRes getHomeUserLikeDetailRes() {
-        List<Exhibition> userLikeList = exhibitionRepository.findTop4ByOrderByLikeCountDesc();
-        List<GetHomeUserLikeDetailRes.UserLikeList> getuserLikeList = userLikeList.stream()
-                .map(userLike -> new GetHomeUserLikeDetailRes.UserLikeList(userLike.getExhibitionImg(), userLike.getExhibitionName(), userLike.getLocation(), userLike.getArtist()))
+        List<Story> userLikeList = storyRepository.findTop4ByOrderByLikeCountDesc();
+        List<GetHomeUserLikeDetailRes.UserLikeList> getLikeViewList = userLikeList.stream()
+                .map(userLike -> new GetHomeUserLikeDetailRes.UserLikeList(userLike.getExhibition().getExhibitionImg(), userLike.getUser().getUserImg(), userLike.getExhibition().getLocation(), userLike.getUser().getNickname()))
                 .collect(Collectors.toList());
-        return new GetHomeUserLikeDetailRes(getuserLikeList);
+        return new GetHomeUserLikeDetailRes(getLikeViewList);
     }
 }

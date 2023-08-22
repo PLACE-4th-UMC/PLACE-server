@@ -39,6 +39,7 @@ public class StoryController {
     @GetMapping("/{storyIdx}")
     public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx, @RequestParam Long userId) {
         try {
+            System.out.println("storyIdx = " + storyIdx);
             return new BaseResponse<>(storyService.getStoryDetail(storyIdx, userId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

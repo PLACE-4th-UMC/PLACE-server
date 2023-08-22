@@ -43,6 +43,8 @@ public class Story extends BaseEntity {
     @OneToMany(mappedBy = "story") // 양방향 매핑
     private List<StoryLike> likes = new ArrayList<>();
 
+    private int viewCount;  // 조회수
+    private int likeCount; // 좋아요 수
     @Builder
     public Story(User user, Exhibition exhibition, String storyImg) {
         this.user = user;
@@ -51,5 +53,12 @@ public class Story extends BaseEntity {
     }
     public void setStoryImg(String storyImg){
         this.storyImg = storyImg;
+    }
+
+    public void setViewCount(int viewCount){
+        this.viewCount = viewCount;
+    }
+    public void setLikeCount(int viewCount){
+        this.likeCount = likeCount;
     }
 }
