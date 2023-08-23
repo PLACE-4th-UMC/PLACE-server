@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  AWS_S3_BUCKET: place-s3
+  AWS_S3_BUCKET: place-deploy
   AWS_CODE_DEPLOY_APPLICATION: place
   AWS_CODE_DEPLOY_GROUP: place-group
   APPLICATION: ${{secrets.APPLICATION}}
