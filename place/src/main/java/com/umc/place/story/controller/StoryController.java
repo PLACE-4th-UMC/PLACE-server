@@ -84,6 +84,19 @@ public class StoryController {
         }
     }
 
+    @DeleteMapping("{storyIdx}/{commentIdx}")
+    public BaseResponse<Void> deleteStoryComment(@PathVariable Long storyIdx,
+                                                 @PathVariable Long commentIdx) {
+        try {
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
+            return new BaseResponse<>(commentService.deleteComment(storyIdx, commentIdx, authService.getUserIdx()));
+        } catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
     @PostMapping("/{storyIdx}/like")
     public BaseResponse<Void> likeStory(@PathVariable Long storyIdx) {
         try {
