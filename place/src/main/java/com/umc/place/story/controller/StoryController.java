@@ -15,8 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import static com.umc.place.common.BaseResponseStatus.NULL_STORY;
-import static com.umc.place.common.BaseResponseStatus.SUCCESS;
+import java.io.IOException;
+
+import static com.umc.place.common.BaseResponseStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +26,8 @@ public class StoryController {
 
     private final StoryService storyService;
     private final CommentService commentService;
+    private final AuthService authService;
+    private final S3Upload s3Upload;
 
     @PostMapping("")
     public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto,
@@ -39,7 +42,6 @@ public class StoryController {
     @GetMapping("/{storyIdx}")
     public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx, @RequestParam Long userId) {
         try {
-            System.out.println("storyIdx = " + storyIdx);
             return new BaseResponse<>(storyService.getStoryDetail(storyIdx, userId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());

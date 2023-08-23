@@ -34,6 +34,8 @@ public enum BaseResponseStatus {
     NULL_EXHIBITION_LIKE(false, 2202, "전시회 좋아요 수가 이미 0입니다."),
 
     // comment(2300~2399)
+    INVALID_COMMENT_IDX(false, 2300, "잘못된 댓글 Idx 입니다."),
+    NOT_OWNER(false, 2301, "현재 로그인한 회원이 해당 댓글을 업로드한 사용자가 아니므로, 삭제할 권한이 없습니다."),
 
     /**
      * 3000: Response 오류
@@ -53,7 +55,8 @@ public enum BaseResponseStatus {
     /**
      * 4000: DB, Server 오류
      */
-    DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패했습니다.");
+    DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패했습니다."),
+    S3_ERROR(false, 4001, "S3 연결에 실패했습니다.");
 
     private final boolean isSuccess;
     private final int code;

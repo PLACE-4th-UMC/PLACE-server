@@ -70,6 +70,15 @@ public class AuthService {
         return claims;
     }
 
+    //로그인 여부 판단
+    public boolean isMember() throws BaseException {
+        String token = getToken();
+        //로그인 상태 아닐경우
+        if(token == null) return false;
+        //로그인 상태일 경우
+        else return true;
+    }
+
     //identifier 가져오기
     public String getIdentifier() throws BaseException{
         String token = getToken();

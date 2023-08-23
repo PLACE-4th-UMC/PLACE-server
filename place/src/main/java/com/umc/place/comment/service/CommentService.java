@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.INACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,28 @@ public class CommentService {
             commentRepository.save(comment);
 
             return new CommentUploadResDto(story.getComments());
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    @Transactional
+    public Void deleteComment(Long storyIdx, Long commentIdx, Long ownerIdx) throws BaseException {
+        try {
+            Comment comment = commentRepository.findById(commentIdx).orElseThrow(() -> new BaseException(INVALID_COMMENT_IDX));
+            User owner = userRepository.findById(ownerIdx).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            Story story = storyRepository.findById(storyIdx).orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
+
+            if (!comment.getUser().equals(owner)) { // 현재 로그인한 사람이 comment의 주인이 아닐때
+                throw new BaseException(NOT_OWNER);
+            }
+
+            comment.setStatus(INACTIVE);
+            story.getComments().remove(comment); // 양방향 연관관계
+
+            return null;
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
