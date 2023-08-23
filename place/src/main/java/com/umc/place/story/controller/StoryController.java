@@ -54,7 +54,7 @@ public class StoryController {
             if (authService.isMember()) {
                 loginUserId = authService.getUserIdx();
             }
-            return new BaseResponse<>(storyService.getStoryDetail(storyIdx, authService.getUserIdx()));
+            return new BaseResponse<>(storyService.getStoryDetail(storyIdx, loginUserId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
