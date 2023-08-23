@@ -58,7 +58,7 @@ jobs:
         aws deploy push \
           --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
           --ignore-hidden-files \
-          --s3-location s3://$AWS_S3_BUCKET/cicdtest/$GITHUB_SHA.zip \
+          --s3-location s3://$AWS_S3_BUCKET/place/$GITHUB_SHA.zip \
           --source ./place
     
     - name: EC2에 배포
