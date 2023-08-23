@@ -5,18 +5,21 @@ import com.umc.place.comment.dto.CommentUploadResDto;
 import com.umc.place.comment.service.CommentService;
 import com.umc.place.common.BaseException;
 import com.umc.place.common.BaseResponse;
+import com.umc.place.common.service.S3Upload;
 import com.umc.place.exhibition.dto.SearchExhibitionsByNameResDto;
 import com.umc.place.story.dto.StoryDetailResponseDto;
 import com.umc.place.story.dto.StoryUploadRequestDto;
 import com.umc.place.story.dto.StoryUploadResponseDto;
 import com.umc.place.story.service.StoryService;
+import com.umc.place.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import static com.umc.place.common.BaseResponseStatus.NULL_STORY;
-import static com.umc.place.common.BaseResponseStatus.SUCCESS;
+import java.io.IOException;
+
+import static com.umc.place.common.BaseResponseStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,21 +28,33 @@ public class StoryController {
 
     private final StoryService storyService;
     private final CommentService commentService;
+    private final AuthService authService;
+    private final S3Upload s3Upload;
 
     @PostMapping("")
-    public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto,
-                                                            @RequestParam Long userId) {
+    public BaseResponse<StoryUploadResponseDto> uploadStory(@RequestBody StoryUploadRequestDto storyUploadRequestDto) {
         try {
-            return new BaseResponse<>(storyService.uploadStory(storyUploadRequestDto, userId));
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
+            String imgPath = s3Upload.upload(storyUploadRequestDto.getImgFile(), "story");
+            return new BaseResponse<>(
+                    storyService.uploadStory(storyUploadRequestDto, authService.getUserIdx(), imgPath));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
+        } catch (IOException e) {
+            return new BaseResponse<>(S3_ERROR);
         }
     }
 
     @GetMapping("/{storyIdx}")
-    public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx, @RequestParam Long userId) {
+    public BaseResponse<StoryDetailResponseDto> getStoryDetail(@PathVariable Long storyIdx) {
         try {
-            return new BaseResponse<>(storyService.getStoryDetail(storyIdx, userId));
+            Long loginUserId = null;
+            if (authService.isMember()) {
+                loginUserId = authService.getUserIdx();
+            }
+            return new BaseResponse<>(storyService.getStoryDetail(storyIdx, loginUserId));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
@@ -58,20 +73,24 @@ public class StoryController {
 
     @PostMapping("/{storyIdx}/comment")
     public BaseResponse<CommentUploadResDto> uploadStoryComment(@PathVariable Long storyIdx,
-                                                                @RequestBody CommentUploadReqDto reqDto,
-                                                                @RequestParam Long userId) {
+                                                                @RequestBody CommentUploadReqDto reqDto) {
         try {
-            return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, userId));
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
+            return new BaseResponse<>(commentService.uploadComment(storyIdx, reqDto, authService.getUserIdx()));
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
     }
 
     @PostMapping("/{storyIdx}/like")
-    public BaseResponse<Void> likeStory(@PathVariable Long storyIdx,
-                                        @RequestParam Long userIdx) {
+    public BaseResponse<Void> likeStory(@PathVariable Long storyIdx) {
         try {
-            storyService.likeStory(storyIdx, userIdx);
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
+            storyService.likeStory(storyIdx, authService.getUserIdx());
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -79,10 +98,13 @@ public class StoryController {
     }
 
     @GetMapping("/uploadView")
-    public BaseResponse<StoryUploadResponseDto> getStoryUploadView(@RequestParam Long userId) {
+    public BaseResponse<StoryUploadResponseDto> getStoryUploadView() {
         try {
-            StoryUploadResponseDto storyView = storyService.getStoryView(userId);
-            if (storyView.getLatestStoryName().isBlank()) { // 유저가 스토리를 업로드하지 않았다면
+            if (!authService.isMember()) { // 로그인 하지 않은 경우
+                throw new BaseException(NULL_TOKEN);
+            }
+            StoryUploadResponseDto storyView = storyService.getStoryView(authService.getUserIdx());
+            if (storyView.getLatestExhibitionName() == null) { // 유저가 스토리를 업로드하지 않았다면
                 return new BaseResponse<>(storyView, NULL_STORY);
             }
             return new BaseResponse<>(storyView);

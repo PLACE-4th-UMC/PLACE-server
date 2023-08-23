@@ -53,7 +53,8 @@ public enum BaseResponseStatus {
     /**
      * 4000: DB, Server 오류
      */
-    DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패했습니다.");
+    DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패했습니다."),
+    S3_ERROR(false, 4001, "S3 연결에 실패했습니다.");
 
     private final boolean isSuccess;
     private final int code;
