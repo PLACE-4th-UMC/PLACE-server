@@ -2,19 +2,24 @@ name: place server CI/CD
 run-name: Running
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: main
 
 env:
   AWS_REGION: ap-northeast-2
   AWS_S3_BUCKET: place-s3
   AWS_CODE_DEPLOY_APPLICATION: place
   AWS_CODE_DEPLOY_GROUP: place-group
+  APPLICATION: ${{secrets.APPLICATION}}
+
+permissions:
+  contents: read
 
 jobs:
-  build-with-gradle:
-    runs-on: ubuntu-20.04
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    
     steps:
     - name: main 브랜치로 이동
       uses: actions/checkout@v3
@@ -25,8 +30,13 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'corretto'
-        
+        distribution: 'temurin'
+
+    - name: actioins/checkout@3
+    - run: touch ./src/main/resources/application.properties
+    - run: echo "${{env.APPLICATION}}" > ./src/main/resources/application.properties
+    - uses: actions/upload-artifact@v2
+    
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
       
@@ -41,7 +51,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY }}
         
     - name: S3에 업로드
-      run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/cicdtest/$GITHUB_SHA.zip --source .
+      run: |
+        aws deploy push \
+          --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
+          --ignore-hidden-files \
+          --s3-location s3://$AWS_S3_BUCKET/cicdtest/$GITHUB_SHA.zip \
+          --source .
     
     - name: EC2에 배포
-      run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=place/$GITHUB_SHA.zip,bundleType=zip
+      run: |
+        aws deploy create-deployment \
+        --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
+        --deployment-config-name CodeDeployDefault.AllAtOnce \
+        --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} \
+        --s3-location bucket=$AWS_S3_BUCKET,key=place/$GITHUB_SHA.zip,bundleType=zip
