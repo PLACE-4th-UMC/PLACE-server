@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.umc.place.common.BaseResponseStatus.*;
+import static com.umc.place.common.Constant.INACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,7 @@ public class CommentService {
                 throw new BaseException(NOT_OWNER);
             }
 
-            commentRepository.delete(comment);
+            comment.setStatus(INACTIVE);
             story.getComments().remove(comment); // 양방향 연관관계
 
             return null;
