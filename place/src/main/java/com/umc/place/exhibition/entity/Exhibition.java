@@ -5,13 +5,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-//@DynamicInsert
+@DynamicInsert
+@EntityListeners(AuditingEntityListener.class)
 public class Exhibition extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +38,7 @@ public class Exhibition extends BaseEntity {
     private String location;
 
     @Column
-    private Long fee;
+    private Integer fee;
 
     @Column(nullable = false)
     private String artist;
@@ -44,4 +46,14 @@ public class Exhibition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Category category;
+
+    @Column(nullable = false)
+    private int likeCount;
+
+    @Column(nullable = false)
+    private int viewCount;
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
 }
