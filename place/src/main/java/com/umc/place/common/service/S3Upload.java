@@ -32,9 +32,9 @@ public class S3Upload {
     private final StoryRepository storyRepository;
 
     //https://jforj.tistory.com/261
-    public void upload(MultipartFile multipartFile, String location,Long idx) throws IOException, BaseException {
+    public String upload(MultipartFile multipartFile, String location) throws IOException, BaseException {
 
-        String originalName = UUID.randomUUID() + multipartFile.getOriginalFilename(); // 파일 이름
+        String originalName = location + "/" + UUID.randomUUID() + multipartFile.getOriginalFilename(); // 파일 이름
         long size = multipartFile.getSize(); // 파일 크기
 
         ObjectMetadata objectMetaData = new ObjectMetadata();
@@ -48,16 +48,17 @@ public class S3Upload {
         );
         String imagePath = amazonS3Client.getUrl(bucket, originalName).toString(); // 접근가능한 URL 가져오기
         System.out.println("imagePath = " + imagePath);
-
-        if (location.equals("profile")) { // 프로필일 경우
-            User user = userRepository.findByUserIdxAndStatusEquals(idx,ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 유저에 저장
-            user.setUserImg(imagePath);
-        }
-        if (location.equals("story")) { // 스토리일 경우
-            Story story = storyRepository.findById(idx).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 스토리에 저장
-            story.setStoryImg(imagePath);
-        }
+        return imagePath;
     }
 }
+
+//        if (location.equals("profile")) { // 프로필일 경우
+//            User user = userRepository.findByUserIdxAndStatusEquals(idx,ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 유저에 저장
+//            user.setUserImg(imagePath);
+//        }
+//        if (location.equals("story")) { // 스토리일 경우
+//            Story story = storyRepository.findById(idx).orElseThrow(() -> new BaseException(INVALID_USER_IDX)); // 스토리에 저장
+//            story.setStoryImg(imagePath);
+//        }
 
 

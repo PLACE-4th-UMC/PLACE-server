@@ -49,21 +49,40 @@ public class StoryService {
             Story findStoryById
                     = storyRepository.findById(storyIdx).orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
 
-            User findUserById = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+            User findUserById = null;
+            Boolean isLiked = null;
 
-            // update history
-            Boolean existsByUserAndStory
-                    = storyHistoryRepository.existsByUserAndStory(findUserById, findStoryById);
-            if (existsByUserAndStory) {
-                StoryHistory history = storyHistoryRepository.findByUserAndStory(findUserById, findStoryById)
-                        .orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
-                history.setLastModifiedDate(LocalDateTime.now());
-            } else {
-                StoryHistory history = StoryHistory.builder()
-                        .story(findStoryById)
-                        .user(findUserById)
-                        .build();
-                storyHistoryRepository.save(history);
+            // 회원 - record history
+            if (userId != null) {
+                findUserById = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
+
+                // isLiked
+                Boolean isExists = storyLikeRepository.existsByUserAndStory(findUserById, findStoryById);
+                if (isExists) {
+                    StoryLike storyLike = storyLikeRepository.findByUserAndStory(findUserById, findStoryById);
+                    if (storyLike.getStatus().equals(ACTIVE)) { // active
+                        isLiked = true;
+                    } else {    // inactive
+                        isLiked = false;
+                    }
+                } else { // 아직 생성 안됨
+                    isLiked = false;
+                }
+
+                // update history
+                Boolean existsByUserAndStory
+                        = storyHistoryRepository.existsByUserAndStory(findUserById, findStoryById);
+                if (existsByUserAndStory) {
+                    StoryHistory history = storyHistoryRepository.findByUserAndStory(findUserById, findStoryById)
+                            .orElseThrow(() -> new BaseException(INVALID_STORY_IDX));
+                    history.setLastModifiedDate(LocalDateTime.now());
+                } else {
+                    StoryHistory history = StoryHistory.builder()
+                            .story(findStoryById)
+                            .user(findUserById)
+                            .build();
+                    storyHistoryRepository.save(history);
+                }
             }
 
             List<CommentResDto> commentDtos = findStoryById.getComments().stream()
@@ -74,9 +93,9 @@ public class StoryService {
                     .storyImg(findStoryById.getStoryImg())
                     .exhibitionAddress(findStoryById.getExhibition().getLocation())
                     .exhibitionName(findStoryById.getExhibition().getExhibitionName())
-                    .storyOwnerImg(findUserById.getUserImg())
+                    .storyOwnerImg(findStoryById.getUser().getUserImg())
                     .comments(commentDtos)
-                    .isLiked(storyLikeRepository.existsByUserAndStory(findUserById, findStoryById))
+                    .isLiked(isLiked)
                     .build();
         } catch (BaseException e) {
             throw e;
@@ -99,7 +118,7 @@ public class StoryService {
     }
 
     @Transactional
-    public StoryUploadResponseDto uploadStory(StoryUploadRequestDto storyUploadRequestDto, Long userId) throws BaseException {
+    public StoryUploadResponseDto uploadStory(StoryUploadRequestDto storyUploadRequestDto, Long userId, String storyImgUrl) throws BaseException {
         try {
             Exhibition exhibition = exhibitionRepository.findById(storyUploadRequestDto.getExhibitionIdx())
                     .orElseThrow(() -> new BaseException(INVALID_EXHIBITION_IDX));
@@ -108,7 +127,7 @@ public class StoryService {
             Story newStory = Story.builder()
                     .user(user)
                     .exhibition(exhibition)
-                    .storyImg(storyUploadRequestDto.getStoryImg())
+                    .storyImg(storyImgUrl)
                     .build();
 
             Story savedStory = storyRepository.save(newStory);
@@ -117,7 +136,7 @@ public class StoryService {
 
             return StoryUploadResponseDto.builder()
                     .latestStoryImg(savedStory.getStoryImg())
-                    .latestStoryName(savedStory.getExhibition().getExhibitionName())
+                    .latestExhibitionName(savedStory.getExhibition().getExhibitionName())
                     .latestStoryLocation(savedStory.getExhibition().getLocation())
                     .recentStories(dateDesc)
                     .build();
@@ -142,7 +161,7 @@ public class StoryService {
                 return StoryUploadResponseDto.builder()
                         .recentStories(storyHistoryList)
                         .latestStoryImg(latestStory.get().getStoryImg())
-                        .latestStoryName(latestStory.get().getExhibition().getExhibitionName())
+                        .latestExhibitionName(latestStory.get().getExhibition().getExhibitionName())
                         .latestStoryLocation(latestStory.get().getExhibition().getLocation())
                         .build();
             } else {

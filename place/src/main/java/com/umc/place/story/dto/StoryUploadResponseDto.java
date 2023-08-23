@@ -15,16 +15,16 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class StoryUploadResponseDto {
     private String latestStoryImg;
-    private String latestStoryName;
+    private String latestExhibitionName;
     private String latestStoryLocation;
 
     private List<RecentStory> recentStories = new ArrayList<>();
 
     @Builder
-    public StoryUploadResponseDto(String latestStoryImg, String latestStoryName,
+    public StoryUploadResponseDto(String latestStoryImg, String latestExhibitionName,
                                   String latestStoryLocation, List<StoryHistory> recentStories) {
         this.latestStoryImg = latestStoryImg;
-        this.latestStoryName = latestStoryName;
+        this.latestExhibitionName = latestExhibitionName;
         this.latestStoryLocation = latestStoryLocation;
         this.recentStories = recentStories.stream()
                 .map(story -> new RecentStory(story))

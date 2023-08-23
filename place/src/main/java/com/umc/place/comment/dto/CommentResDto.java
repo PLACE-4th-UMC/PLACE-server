@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CommentResDto {
 
-    // 이후 디자인에 따라 변동 가능성 있음.
+    private Long commentIdx;
     private String userImg;
     private String userNickName;
     private String content;
@@ -26,6 +26,7 @@ public class CommentResDto {
     }
 
     public CommentResDto(Comment comment) {
+        this.commentIdx = comment.getCommentIdx();
         this.userImg = comment.getUser().getUserImg();
         this.userNickName = comment.getUser().getNickname();
         this.content = comment.getContent();
