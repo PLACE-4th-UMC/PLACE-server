@@ -1,4 +1,4 @@
-name: place server CI/CD
+name: place server
 run-name: Running
 on:
   push:
