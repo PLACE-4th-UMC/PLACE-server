@@ -40,7 +40,7 @@ jobs:
       run: chmod +x ./place/gradlew
       
     - name: 프로젝트 빌드
-      run: ./gradlew clean build -x test
+      run: ./place/gradlew clean build -x test
       
     - name: AWS credential 설정
       uses: aws-actions/configure-aws-credentials@v1
