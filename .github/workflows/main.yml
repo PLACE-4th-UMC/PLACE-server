@@ -32,10 +32,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: actioins/checkout@3
+    - uses: actioins/checkout@3
     - run: touch ./src/main/resources/application.properties
     - run: echo "${{env.APPLICATION}}" > ./src/main/resources/application.properties
     - uses: actions/upload-artifact@v2
+      with:
+        name: application.properties
+        path: ./src/main/resources/application.properties
     
     - name: gradlew에 실행 권한 부여
       run: chmod +x ./gradlew
