@@ -1,7 +1,6 @@
 package com.umc.place.home.controller;
 
 import com.umc.place.common.BaseResponse;
-import com.umc.place.home.dto.GetHomeUserDetailsRes;
 import com.umc.place.home.dto.GetHomeUserLikeDetailRes;
 import com.umc.place.home.dto.GetHomeUserRecentDetailRes;
 import com.umc.place.home.dto.GetHomeUserViewDetailRes;
