@@ -31,8 +31,7 @@ jobs:
         distribution: 'temurin'
 
     - run: |
-        chmod +w ./src/main/resources
-        mkdir ./src/main/resources
+        mkdir -p ./src/main/resources
         cd ./src/main/resources
         touch ./application.properties # application.properties 생성
         echo "${{ env.APPLICATION }}" > ./application.properties
