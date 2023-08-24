@@ -1,5 +1,5 @@
 name: place server
-run-name: Running
+run-name: Deploy 
 on:
   push:
     branches: main
