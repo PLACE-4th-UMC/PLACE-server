@@ -1,5 +1,5 @@
 name: place server
-run-name: Deploy 
+run-name: Deploy EC2
 on:
   push:
     branches: main
