@@ -1,4 +1,4 @@
-name: place server
+name: place server deploy
 run-name: Deploy EC2
 on:
   push:
