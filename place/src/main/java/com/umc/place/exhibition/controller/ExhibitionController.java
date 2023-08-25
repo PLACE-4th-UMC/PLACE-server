@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
 
 import static com.umc.place.common.BaseResponseStatus.SUCCESS;
 
@@ -66,6 +69,7 @@ public class ExhibitionController {
                 oldCookie.setPath("/");
                 oldCookie.setMaxAge(60 * 60 * 24); // 쿠키 생명주기: 24시간 설정
                 response.addCookie(oldCookie); // 쿠키 목록에 현재 조회한 전시회 추가
+                setSameSite(response, "None");
             }
         } else { // 아무 쿠키도 없으면
             this.exhibitionService.updateViewCount(exhibitionIdx); // 조회수+1
@@ -73,8 +77,23 @@ public class ExhibitionController {
             newCookie.setPath("/");
             newCookie.setMaxAge(60 * 60 * 24); // 쿠키 생명주기: 24시간 설정
             response.addCookie(newCookie);
+            setSameSite(response, "None");
         }
         return new BaseResponse<>(exhibitionService.getExhibitionDetail(exhibitionIdx, authService.getUserIdx()));
+    }
+
+    // 쿠키 SameSite=None 설정
+    private static void setSameSite(HttpServletResponse response, String sameSite) {
+        Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+        boolean firstHeader = true;
+        for (String header : headers) {
+            if (firstHeader) {
+                response.setHeader(HttpHeaders.SET_COOKIE, String.format("%s; Secure; %s", header, "SameSite=" + sameSite));
+                firstHeader = false;
+                continue;
+            }
+            response.addHeader(HttpHeaders.SET_COOKIE, String.format("%s; Secure; %s", header, "SameSite=" + sameSite));
+        }
     }
 
     /**
