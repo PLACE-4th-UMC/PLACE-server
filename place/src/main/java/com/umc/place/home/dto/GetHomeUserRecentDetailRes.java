@@ -30,6 +30,8 @@ public class GetHomeUserRecentDetailRes {
         private String userImg;
         private String location;
         private String artist;
+        private Boolean isLike;
+        private Boolean isLogin;
     }
 
 }
