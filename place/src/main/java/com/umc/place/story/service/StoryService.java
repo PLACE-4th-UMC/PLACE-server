@@ -89,6 +89,14 @@ public class StoryService {
                     .map(comment -> new CommentResDto(comment))
                     .collect(Collectors.toList());
 
+
+            //조회수 증가
+            findStoryById.setViewCount(findStoryById.getViewCount()+1);
+
+            if (storyLikeRepository.existsByUserAndStory(findUserById, findStoryById)){ // 좋아요를 누르면
+                findStoryById.setLikeCount(findStoryById.getLikeCount()+1); // 조회수 증가
+            }
+
             return StoryDetailResponseDto.builder()
                     .storyImg(findStoryById.getStoryImg())
                     .exhibitionAddress(findStoryById.getExhibition().getLocation())
