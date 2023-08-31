@@ -16,4 +16,7 @@ public interface StoryRepository extends JpaRepository<Story, Long> {
     Optional<Story> findFirstByUserOrderByCreatedDateDesc(User user);
 
     List<Story> findByUserOrderByCreatedDateDesc(User user);
+    List<Story> findTop4ByOrderByCreatedDateDesc();
+    List<Story> findTop4ByOrderByViewCountDesc();
+    List<Story> findTop4ByOrderByLikeCountDesc();
 }

@@ -27,9 +27,11 @@ public class GetHomeUserRecentDetailRes {
     @Setter
     public static class UserRecentList{
         private String exhibitionImg;
-        private String exhibitionName;
+        private String userImg;
         private String location;
         private String artist;
+        private Boolean isLike;
+        private Boolean isLogin;
     }
 
 }
