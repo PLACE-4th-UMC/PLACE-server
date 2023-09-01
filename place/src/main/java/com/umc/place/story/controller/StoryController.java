@@ -12,6 +12,7 @@ import com.umc.place.story.dto.StoryUploadRequestDto;
 import com.umc.place.story.dto.StoryUploadResponseDto;
 import com.umc.place.story.service.StoryService;
 import com.umc.place.user.service.AuthService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -85,6 +86,7 @@ public class StoryController {
     }
 
     @DeleteMapping("{storyIdx}/{commentIdx}")
+    @Transactional
     public BaseResponse<Void> deleteStoryComment(@PathVariable Long storyIdx,
                                                  @PathVariable Long commentIdx) {
         try {
