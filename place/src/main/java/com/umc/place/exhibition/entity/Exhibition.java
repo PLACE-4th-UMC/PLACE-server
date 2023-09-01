@@ -56,4 +56,7 @@ public class Exhibition extends BaseEntity {
     public void setLikeCount(int likeCount) {
         this.likeCount = likeCount;
     }
+    public void updateViewCount(int viewCount) {
+        this.viewCount = viewCount + 1;
+    }
 }

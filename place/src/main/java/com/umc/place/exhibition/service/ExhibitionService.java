@@ -114,16 +114,17 @@ public class ExhibitionService {
      * @return GetExhibitionDetailRes
      * @throws BaseException
      */
+    @Transactional(rollbackFor = Exception.class)
     public GetExhibitionDetailRes getExhibitionDetail(Long exhibitionIdx, Long userIdx) throws BaseException{
         try {
             Exhibition exhibition = exhibitionRepository.findById(exhibitionIdx).orElseThrow(() -> new BaseException(INVALID_EXHIBITION_IDX));
+            exhibition.updateViewCount(exhibition.getViewCount());
 
             List<GetExhibitionDetailRes.Story> storyList;
             if (userRepository.existsByUserIdxAndStatusEquals(userIdx, ACTIVE)) {
                 User user = userRepository.findByUserIdxAndStatusEquals(userIdx, ACTIVE).orElseThrow(() -> new BaseException(INVALID_USER_IDX));
                 storyList = getStoryList(exhibition, user);
             } else storyList = getStoryListAnonymous(exhibition);
-            //TODO: S3 설정 완료 후 이미지 조회 부분 수정
             return new GetExhibitionDetailRes(
                     exhibition.getExhibitionName(),
                     exhibition.getStartDate(),
