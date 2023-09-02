@@ -1,2 +1,9 @@
 # PLACE-server
-PLACE server build
+> server for PLACE. web
+
+## Tech Stack
+
+## DB
+## Branch Strategy
+## API
+## Member
